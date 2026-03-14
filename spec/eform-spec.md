@@ -1,6 +1,6 @@
 # eForm Specification
 
-Version: 0.1  
+Version: 0.2  
 Status: Draft  
 Project: open-eform
 
@@ -49,10 +49,9 @@ Final validation is the responsibility of the receiving system.
 
 ### Graceful degradation
 
-Without specialized software:
+Without specialized software the document must remain readable.
 
-- the form layout remains visible
-- the document remains printable
+This is achieved through a static SVG preview of the filled form.
 
 ---
 
@@ -69,21 +68,40 @@ form.eform
 ├ schema.json
 ├ data.json
 │
-├ layout/
-│   page1.svg
+├ preview.svg
 │
-├ view/
-│   page1-filled.svg
+├ layout/
+│ page1.svg
 │
 └ registries/
+
+
+The preview SVG contains a static rendering of the filled form and allows the document to remain readable without specialized software.
+
+The ZIP container stores the structured form resources used by viewers and editors.
 
 ---
 
 ## 4. Main Components
 
+### Preview
+
+The preview is a static SVG representation of the filled form.
+
+The preview:
+
+- contains the complete visual representation of the document
+- may contain multiple pages
+- must not contain field anchors
+- must not contain scripts or external resources
+
+The preview ensures that the document remains readable even without eForm software.
+
+---
+
 ### Layout
 
-The layout defines the visual representation of the form.
+The layout defines the editable structure of the form.
 
 Layouts use **SVG**.
 
@@ -115,22 +133,9 @@ The data file stores the current field values.
 Example:
 
 {
-  "values": {
-    "firstname": "Anna"
-  }
+"firstname": "Anna"
 }
 
----
-
-### Rendered View (Optional)
-
-A rendered SVG representation of the filled form may be included.
-
-Example:
-
-view/page1-filled.svg
-
-This allows the document to remain readable without specialized software.
 
 ---
 
@@ -149,10 +154,11 @@ These registries may reference external standards.
 
 eForm is designed so that:
 
-- operating systems can display the SVG layout
-- specialized software can provide editing functionality
+- operating systems can display the preview SVG directly
+- browsers can display the document without specialized software
+- specialized software can provide interactive editing
 
-A viewer may add editing capabilities while preserving the original layout.
+A viewer reads the container to access schema, data, and layout resources.
 
 ---
 
@@ -160,8 +166,9 @@ A viewer may add editing capabilities while preserving the original layout.
 
 The specification uses semantic versioning.
 
-0.x experimental  
+0.x experimental
 1.x stable
+
 
 The manifest must include the specification version.
 
@@ -174,7 +181,8 @@ The manifest must include the specification version.
 | eForm | document container |
 | Viewer | software rendering and editing the form |
 | Schema | logical field definition |
-| Layout | visual representation |
+| Layout | editable form template |
+| Preview | static rendered form document |
 | Field Anchor | SVG element defining field geometry |
 
 ---
@@ -182,3 +190,21 @@ The manifest must include the specification version.
 ## 8. Project Status
 
 This specification is experimental and subject to change.
+
+Change Log (building for your commit)
+
+Current tracked changes:
+
+SPEC REFACTOR (draft)
+
+Architecture
+- remove view/ directory concept
+- introduce preview.svg static rendering
+- simplify container structure
+
+Specification
+- clarify preview vs layout responsibilities
+- simplify data.json example
+
+Compatibility
+- allow direct rendering via preview.svg

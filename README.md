@@ -1,6 +1,6 @@
 # eForm
 
-Version: 0.1
+Version: 0.2
 
 **eForm** is an open document format for electronic forms.
 
@@ -28,7 +28,7 @@ The format separates **visual layout**, **form structure**, and **user data**.
 
 An eForm document should remain readable like a paper form even without specialized software.
 
-Opening the layout SVG should still show a printable form.
+Opening the document should still show a printable form.
 
 ---
 
@@ -46,10 +46,11 @@ These technologies ensure the format remains readable and easy to implement.
 
 ## Basic Structure
 
-An `.eform` file is a ZIP container.
+An `.eform` file is a ZIP container containing the form resources.
 
 Example structure:
 
+```
 form.eform
 │
 ├ mimetype
@@ -57,19 +58,22 @@ form.eform
 ├ schema.json
 ├ data.json
 │
-├ layout/
-│ page1.svg
+├ preview.svg
 │
-├ view/
-│ page1-filled.svg
+├ layout/
+│   page1.svg
 │
 └ registries/
-standards.json
+    standards.json
+```
 
+### Preview
+
+`preview.svg` contains a static rendering of the filled form so the document remains readable even without specialized software.
 
 ### Layout
 
-The **SVG layout** defines the visual structure of the form.
+The **SVG layout** defines the editable structure of the form.
 
 ### Schema
 
@@ -79,10 +83,6 @@ The **schema** describes field types and validation hints.
 
 The **data file** stores the current values of the form fields.
 
-### Rendered View (optional)
-
-A filled SVG representation may be included so the document remains readable without specialized software.
-
 ---
 
 ## Field Anchors
@@ -91,8 +91,9 @@ Form fields are defined directly in the SVG layout using **field anchors**.
 
 Example:
 
-<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>
-
+```
+&lt;rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/&gt;
+```
 
 The `data-eform-field` attribute links the visual layout to the field defined in `schema.json`.
 
@@ -115,12 +116,13 @@ This design keeps viewer implementations simple.
 
 ## Repository Structure
 
-spec/ format specifications
-examples/ example forms
-viewer/ reference viewer prototype
-tools/ helper utilities
-docs/ documentation and guides
-
+```
+spec/       format specifications
+examples/   example forms
+viewer/     reference viewer prototype
+tools/      helper utilities
+docs/       documentation and guides
+```
 
 ---
 

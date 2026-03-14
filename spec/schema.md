@@ -1,6 +1,6 @@
 # eForm Schema Specification
 
-Version: 0.1
+Version: 0.2
 
 ---
 
@@ -24,6 +24,7 @@ Field positions are defined in the SVG layout using field anchors.
 
 Example field definition:
 
+```json
 {
   "fields": {
     "firstname": {
@@ -33,12 +34,15 @@ Example field definition:
     }
   }
 }
+```
 
 Each field must correspond to a field anchor in the SVG layout.
 
 Example anchor:
 
-<rect data-eform-field="firstname"/>
+```
+&lt;rect data-eform-field="firstname"/&gt;
+```
 
 ---
 
@@ -59,11 +63,13 @@ Example anchor:
 
 Supported field types:
 
-string  
-number  
-date  
-boolean  
+```
+string
+number
+date
+boolean
 selection
+```
 
 Viewers may render different UI widgets depending on the field type.
 
@@ -75,9 +81,11 @@ Validation hints guide the form filling software but do not replace server-side 
 
 Examples:
 
-maxLength  
-pattern  
+```
+maxLength
+pattern
 required
+```
 
 ---
 
@@ -87,39 +95,69 @@ Fields may reference external standards using registries.
 
 Example:
 
+```json
 {
   "birthcountry": {
     "type": "selection",
     "codeList": "std_iso3166"
   }
 }
+```
 
 The referenced registry must be defined in:
 
+```
 registries/standards.json
+```
 
 ---
 
-## 7. Field Anchor Mapping
+## 7. Field Identifier
+
+The key of each field entry represents the **field identifier**.
+
+Example:
+
+```json
+{
+  "fields": {
+    "firstname": {
+      "type": "string"
+    }
+  }
+}
+```
+
+This identifier is used consistently across the document:
+
+- in the schema
+- in the SVG layout
+- in `data.json`
+
+---
+
+## 8. Field Anchor Mapping
 
 Each schema field must correspond to a field anchor in the SVG layout.
 
 The mapping is defined using the attribute:
 
+```
 data-eform-field
+```
 
 Example:
 
-schema field:
+Schema field:
 
+```
 firstname
+```
 
 SVG anchor:
 
-<rect data-eform-field="firstname"/>
+```
+&lt;rect data-eform-field="firstname"/&gt;
+```
 
 Viewers use this mapping to connect schema semantics with layout geometry.
-
-The key of each field entry represents the stable field identifier.
-
-SVG field anchors and data values reference this identifier.
