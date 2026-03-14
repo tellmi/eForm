@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm">
+
+  <style>
+    text { font-family: sans-serif; font-size: 4mm; }
+    .title { font-size: 6mm; font-weight: bold; }
+    .field { fill: none; stroke: black; stroke-width: 0.3; }
+  </style>
+
+  <!-- Title -->
+  <text class="title" x="20" y="30">Example eForm – Simple Registration</text>
+
+  <!-- First name -->
+  <text x="20" y="60">First name</text>
+  <rect class="field" x="70" y="65" width="100" height="10"/>
+
+  <!-- Last name -->
+  <text x="20" y="90">Last name</text>
+  <rect class="field" x="70" y="95" width="100" height="10"/>
+
+  <!-- Birth date -->
+  <text x="20" y="120">Birth date</text>
+  <rect class="field" x="70" y="125" width="60" height="10"/>
+
+  <!-- Birth country -->
+  <text x="20" y="150">Birth country</text>
+  <rect class="field" x="70" y="155" width="100" height="10"/>
+
+</svg>

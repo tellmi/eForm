@@ -1,0 +1,11 @@
+{
+  "version": "0.1",
+  "layout": [
+    "layout/page1.svg"
+  ],
+  "schema": "schema.json",
+  "data": "data.json",
+  "registries": [
+    "registries/standards.json"
+  ]
+}

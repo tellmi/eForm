@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>eForm Viewer (Prototype)</title>
+
+<style>
+
+body {
+  font-family: sans-serif;
+  margin: 20px;
+}
+
+#toolbar {
+  margin-bottom: 10px;
+}
+
+#container {
+  position: relative;
+  width: 800px;
+  border: 1px solid #ccc;
+}
+
+#container svg {
+  width: 100%;
+}
+
+.field {
+  fill: none;
+  stroke: black;
+  stroke-width: 0.3;
+  pointer-events: none;
+}
+
+[data-eform-field]:hover {
+  stroke: #0066ff;
+}
+
+button {
+  margin-left: 10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>eForm Viewer Prototype</h2>
+
+<div id="toolbar">
+  <input type="file" id="fileInput">
+  <button id="saveBtn">Save Form</button>
+</div>
+
+<div id="container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="viewer.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "fields": {
+    "firstname": {
+      "type": "string",
+      "label": "First name",
+      "maxLength": 40
+    },
+    "lastname": {
+      "type": "string",
+      "label": "Last name",
+      "maxLength": 40
+    },
+    "birthdate": {
+      "type": "date",
+      "label": "Birth date"
+    },
+    "birthcountry": {
+      "type": "selection",
+      "label": "Birth country",
+      "codeList": "std_iso3166"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "standards": {
+
+    "std_iso3166": {
+      "system": "ISO-3166-1",
+      "version": "2023",
+      "description": "Two-letter country codes",
+      "url": "https://www.iso.org/iso-3166-country-codes.html"
+    }
+
+  }
+}
