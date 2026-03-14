@@ -1,4 +1,5 @@
 {
+  "type": "open-eform",
   "version": "0.1",
   "layout": [
     "layout/page1.svg"

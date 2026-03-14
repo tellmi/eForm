@@ -149,8 +149,19 @@ Registries provide reusable references such as:
 These registries may reference external standards.
 
 ---
+## 5. MIME Type
 
-## 5. Compatibility
+The MIME type for eForm documents is:
+
+application/eform+zip
+
+The container must include a file named `mimetype` as the first entry
+in the ZIP archive.
+
+The file must contain exactly the MIME type string and must not be
+compressed.
+
+## 6. Compatibility
 
 eForm is designed so that:
 
@@ -162,7 +173,7 @@ A viewer reads the container to access schema, data, and layout resources.
 
 ---
 
-## 6. Versioning
+## 7. Versioning
 
 The specification uses semantic versioning.
 
@@ -174,7 +185,7 @@ The manifest must include the specification version.
 
 ---
 
-## 7. Terminology
+## 8. Terminology
 
 | Term | Meaning |
 |-----|------|
@@ -187,7 +198,7 @@ The manifest must include the specification version.
 
 ---
 
-## 8. Project Status
+## 9. Project Status
 
 This specification is experimental and subject to change.
 
