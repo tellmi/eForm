@@ -2,12 +2,18 @@ let zip;
 let manifest;
 let schema;
 let data = {};
+let originalFileName = "form.eform";
 
 document.getElementById("fileInput").addEventListener("change", openForm);
+document.getElementById("saveBtn").addEventListener("click", saveForm);
 
 async function openForm(event)
 {
     const file = event.target.files[0];
+
+    if (!file) return;
+
+    originalFileName = file.name;
 
     zip = await JSZip.loadAsync(file);
 
@@ -24,17 +30,22 @@ async function openForm(event)
         data = {};
     }
 
-    const svgPath = manifest.layout[0];
-
-    const svgText = await zip.file(svgPath).async("string");
-
     const container = document.getElementById("container");
+    container.innerHTML = "";
 
-    container.innerHTML = svgText;
+    for (const svgPath of manifest.layout)
+    {
+        const svgText = await zip.file(svgPath).async("string");
 
-    const svg = container.querySelector("svg");
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = svgText;
 
-    renderFields(svg);
+        const svg = wrapper.querySelector("svg");
+
+        renderFields(svg);
+
+        container.appendChild(wrapper);
+    }
 }
 
 function renderFields(svg)
@@ -67,11 +78,11 @@ function renderFields(svg)
 
         svg.appendChild(text);
 
-        anchor.style.cursor = "text";
-
         anchor.addEventListener("click", () =>
         {
-            const input = prompt("Enter value:", data[fieldId] || "");
+            const label = schema.fields[fieldId]?.label || fieldId;
+
+            const input = prompt(`Enter ${label}:`, data[fieldId] || "");
 
             if (input !== null)
             {
@@ -80,4 +91,25 @@ function renderFields(svg)
             }
         });
     });
+}
+
+async function saveForm()
+{
+    if (!zip || !manifest) return;
+
+    const json = JSON.stringify(data, null, 2);
+
+    zip.file(manifest.data || "data.json", json);
+
+    const blob = await zip.generateAsync({ type: "blob" });
+
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+    link.download = originalFileName;
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
 }
