@@ -1,6 +1,6 @@
 # eForm
 
-Version: 0.2
+Version: 0.3
 
 **eForm** is an open document format for electronic forms.
 
@@ -36,8 +36,8 @@ Opening the document should still show a printable form.
 
 eForm intentionally uses simple and widely supported technologies:
 
-- **ZIP container** for packaging
-- **SVG** for visual form layout
+- **SVG** for visual form layout and preview
+- **ZIP container** for packaging structured resources
 - **JSON** for schema and form data
 
 These technologies ensure the format remains readable and easy to implement.
@@ -46,25 +46,30 @@ These technologies ensure the format remains readable and easy to implement.
 
 ## Basic Structure
 
-An `.eform` file is a ZIP container containing the form resources.
+An `.eform` file consists of two parts:
 
-Example structure:
+1. a **static SVG preview**
+2. a **ZIP container containing the form resources**
+
+Conceptual structure:
 
 ```
 form.eform
-│
-├ mimetype
-├ manifest.json
-├ schema.json
-├ data.json
-│
-├ preview.svg
-│
-├ layout/
-│   page1.svg
-│
-└ registries/
-    standards.json
+
+preview.svg
+
+[ZIP container]
+
+mimetype
+manifest.json
+schema.json
+data.json
+
+layout/
+  page1.svg
+
+registries/
+  standards.json
 ```
 
 ### Preview
@@ -92,7 +97,7 @@ Form fields are defined directly in the SVG layout using **field anchors**.
 Example:
 
 ```
-&lt;rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/&gt;
+<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>
 ```
 
 The `data-eform-field` attribute links the visual layout to the field defined in `schema.json`.
@@ -103,12 +108,13 @@ The `data-eform-field` attribute links the visual layout to the field defined in
 
 A viewer processes an eForm roughly as follows:
 
-1. open the `.eform` ZIP container  
-2. read `manifest.json`  
-3. load the SVG layout  
-4. detect field anchors  
-5. match them with `schema.json`  
-6. display values from `data.json`  
+1. open the `.eform` file  
+2. locate the embedded ZIP container  
+3. read `manifest.json`  
+4. load the SVG layout  
+5. detect field anchors  
+6. match them with `schema.json`  
+7. display values from `data.json`  
 
 This design keeps viewer implementations simple.
 
