@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+
+<title>eForm mimetype icon</title>
+
+<!-- green form label -->
+<rect x="60" y="60" width="90" height="180" rx="20"
+      fill="#a8d68a" stroke="#a8d68a" stroke-width="12"/>
+
+<!-- form lines -->
+<g fill="none" stroke="currentColor" stroke-linecap="round">
+
+  <!-- left column -->
+  <path d="M98 92.193h44.323" stroke-width="20"/>
+  <path d="M98 123.28h44.323" stroke-width="20"/>
+  <path d="M98 154.12h44.323" stroke-width="20"/>
+
+  <!-- right column -->
+  <path d="M180.69 92.134h44.323" stroke-width="20"/>
+  <path d="M180.69 123.22h44.323" stroke-width="20"/>
+  <path d="M180.69 154.06h44.323" stroke-width="20"/>
+
+  <!-- page fold -->
+  <path d="M223.8 43.31l32.496 30.142" stroke-width="10"/>
+
+</g>
+
+<!-- document frame -->
+<rect x="30" y="30" width="240" height="240" rx="20"
+      fill="none" stroke="currentColor" stroke-width="24"/>
+
+<!-- label -->
+<text x="156.48" y="243.27"
+      fill="#e67600"
+      font-family="IBM Plex Serif"
+      font-size="105.83"
+      font-weight="bold"
+      text-anchor="middle">eF</text>
+
+<metadata>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:cc="http://creativecommons.org/ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<cc:Work rdf:about="">
+<dc:title>eForm mimetype icon</dc:title>
+<dc:creator>
+<cc:Agent>
+<dc:title>Marco Jehnichen</dc:title>
+</cc:Agent>
+</dc:creator>
+<cc:license rdf:resource="http://creativecommons.org/licenses/by/4.0/"/>
+</cc:Work>
+
+</rdf:RDF>
+</metadata>
+
+</svg>

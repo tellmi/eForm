@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="300mm"
+   height="300mm"
+   viewBox="0 0 300 300"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   sodipodi:docname="eForm2.svg"
+   inkscape:export-filename="eForm.png"
+   inkscape:export-xdpi="1.3546667"
+   inkscape:export-ydpi="1.3546667"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">eForm mimetype icon</title>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.35"
+     inkscape:cx="1004.2857"
+     inkscape:cy="491.42857"
+     inkscape:window-width="1920"
+     inkscape:window-height="973"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer3" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Form"
+     style="display:inline">
+    <rect
+       style="display:inline;fill:#a8d68a;fill-opacity:1;stroke:#a8d68a;stroke-width:12;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+       id="form_label"
+       width="90"
+       height="180"
+       x="60"
+       y="60"
+       rx="20"
+       ry="20" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 92.812498,92.193285 H 137.1352"
+       id="path3" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 201.61714,38.964596 60.84051,53.194617"
+       id="path3-7-8" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 92.8125,123.27946 h 44.3227"
+       id="path3-4" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 92.812498,154.12232 H 137.1352"
+       id="path3-9" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 180.69444,92.134225 h 44.3227"
+       id="path3-5" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 180.69444,123.2204 h 44.3227"
+       id="path3-4-9" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 180.69444,154.06326 h 44.3227"
+       id="path3-9-4" />
+  </g>
+  <g
+     inkscape:label="Frame"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:24;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+       id="rect2"
+       width="240"
+       height="240"
+       x="30"
+       y="30"
+       rx="20"
+       ry="20" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Text"
+     style="display:inline">
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:105.833px;line-height:1.25;font-family:'IBM Plex Serif';-inkscape-font-specification:'IBM Plex Serif Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#e67600;fill-opacity:1;stroke:#e67600;stroke-width:0.265;stroke-dasharray:none;stroke-opacity:1"
+       x="156.48216"
+       y="243.26544"
+       id="text3"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:105.833px;font-family:'IBM Plex serif';-inkscape-font-specification:'IBM Plex serif Bold';fill:#e67600;fill-opacity:1;stroke:#e67600;stroke-width:0.265;stroke-dasharray:none;stroke-opacity:1"
+         x="156.48216"
+         y="243.26544">eF</tspan></text>
+  </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by/4.0/" />
+        <dc:title>eForm mimetype icon</dc:title>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>Marco Jehnichen</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

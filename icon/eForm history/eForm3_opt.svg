@@ -1,0 +1,49 @@
+<svg viewBox="0 0 300 300"
+     xmlns="http://www.w3.org/2000/svg"
+     shape-rendering="geometricPrecision">
+
+<title>eForm mimetype icon</title>
+
+<!-- form block -->
+<rect x="60" y="60" width="90" height="180" rx="20"
+      fill="#a8d68a" stroke="#a8d68a" stroke-width="12"/>
+
+<!-- form lines -->
+<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="20">
+  <path d="M92.8125 85.8433H137.1352"/>
+  <path d="M92.8125 116.9294h44.3227"/>
+  <path d="M92.8125 147.7723H137.1352"/>
+
+  <path d="M169.0527 85.7842h44.3227"/>
+  <path d="M169.0527 116.8704h44.3227"/>
+
+  <!-- page fold -->
+  <path d="M201.6171 38.9646l60.8405 53.1946"/>
+</g>
+
+<!-- document frame -->
+<rect x="30" y="30" width="240" height="240" rx="20"
+      fill="none" stroke="currentColor" stroke-width="24"/>
+
+<!-- eF text -->
+<path fill="#e67600" stroke="#e67600" stroke-width=".368"
+      transform="scale(1.0027777 .99723)"
+      d="m106.99337 257.46281q-10.49865 0-18.626633-3.38666-7.958651-3.55599-13.54664-9.65198-5.418655-6.26532-8.297316-14.73197-2.878661-8.63598-2.878661-18.79596 0-10.66798 2.878661-19.30396 3.047994-8.63598 8.466649-14.56264 5.587989-5.92665 13.207974-9.14398 7.789317-3.21733 17.271966-3.21733 9.48265 0 17.10263 2.87866 7.61999 2.87866 12.86931 8.29732 5.41865 5.24932 8.29732 12.86931 2.87866 7.61998 2.87866 16.9333v5.75732H90.906732v6.77332q0 11.34531 5.926654 17.10263 5.926654 5.75732 15.747964 5.75732 9.14399 0 14.73197-4.06399 5.58799-4.23332 7.95866-10.15998l9.31331 5.58799q-1.524 4.23332-4.40266 8.63598-2.87866 4.40266-7.45065 8.12799-4.57199 3.55599-11.00664 5.92665-6.43466 2.37066-14.73197 2.37066zM90.906732 200.73626h29.125278v-2.37066q0-12.19198-3.89466-17.10263-3.89466-4.91066-10.66798-4.91066-6.773321 0-10.66798 4.91066-3.894658 4.91065-3.894658 17.10263zm68.241338 43.51858h11.85331v-95.84247h-11.85331v-11.17598h94.31847v31.49593h-19.64262v-19.30396h-35.3906v40.80925h22.35196v-10.15998h12.53064v32.51194h-12.53064v-10.15998h-22.35196v41.82525h16.08664v11.17598h-55.37189z"/>
+
+<metadata>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:cc="http://creativecommons.org/ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<cc:Work rdf:about="">
+<dc:title>eForm mimetype icon</dc:title>
+<dc:creator>
+<cc:Agent><dc:title>Marco Jehnichen</dc:title></cc:Agent>
+</dc:creator>
+<cc:license rdf:resource="http://creativecommons.org/licenses/by/4.0/"/>
+</cc:Work>
+
+</rdf:RDF>
+</metadata>
+
+</svg>

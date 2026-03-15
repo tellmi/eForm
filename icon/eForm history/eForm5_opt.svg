@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 300 300"
+     xmlns="http://www.w3.org/2000/svg"
+     shape-rendering="geometricPrecision">
+
+<title>eForm mimetype icon</title>
+
+<g id="form">
+  <rect x="37.575279" y="37.575279"
+        width="114.84944" height="224.8494"
+        rx="25.522099" ry="24.983265"
+        fill="#a8d68a"
+        stroke="#a8d68a"
+        stroke-width="15.1506"/>
+
+  <g stroke="#000" stroke-width="20" stroke-linecap="round" fill="none">
+    <path d="M92.812498 85.843281H137.1352"/>
+    <path d="M92.8125 116.92942h44.3227"/>
+    <path d="M92.812498 147.77228H137.1352"/>
+    <path d="M169.0527 85.784221h44.3227"/>
+    <path d="M169.0527 116.87036h44.3227"/>
+  </g>
+</g>
+
+<g id="frame">
+  <path stroke="#7fbf5f"
+        stroke-width="10"
+        stroke-linecap="round"
+        fill="none"
+        d="m212.06791 15.008191 73.11287 65.911175"/>
+
+  <path fill="none"
+        stroke="#7fbf5f"
+        stroke-width="10"
+        stroke-linejoin="round"
+        d="M37.070371 14.48447H211.47145l-2.79753 48.455968c-.7212 12.491799 10.11185 23.567326 22.58592 22.585922l54.25571-4.268601V262.92962c0 12.5126-10.07332 22.58592-22.58592 22.58592H37.070371c-12.512601 0-22.585922-10.07332-22.585922-22.58592V37.070395c0-12.512605 10.073321-22.585925 22.585922-22.585925z"/>
+</g>
+
+<text x="160.38249"
+      y="265.41504"
+      transform="scale(1.0024253 .99758054)"
+      text-anchor="middle"
+      font-family="IBM Plex Serif"
+      font-weight="bold"
+      font-size="180.532"
+      fill="#e67600"
+      stroke="#e67600"
+      stroke-width="2.13227">
+  eF
+</text>
+
+<metadata>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:cc="http://creativecommons.org/ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/">
+<cc:Work rdf:about="">
+<dc:title>eForm mimetype icon</dc:title>
+<dc:publisher>
+<cc:Agent><dc:title>Marco Jehnichen</dc:title></cc:Agent>
+</dc:publisher>
+<cc:license rdf:resource="http://creativecommons.org/licenses/by/4.0/"/>
+</cc:Work>
+</rdf:RDF>
+</metadata>
+
+</svg>
