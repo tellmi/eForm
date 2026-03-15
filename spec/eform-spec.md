@@ -97,6 +97,9 @@ The preview:
 
 The preview ensures that the document remains readable even without eForm software.
 
+The preview SVG may end with an open XML comment so that
+additional container data can follow the document.
+
 ---
 
 ### Layout

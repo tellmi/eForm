@@ -17,17 +17,21 @@ async function openForm(event)
 
     zip = await JSZip.loadAsync(file);
 
+    if (!zip.file("manifest.json"))
+    {
+        alert("Not a valid eForm container.");
+        return;
+    }
+
     manifest = JSON.parse(await zip.file("manifest.json").async("string"));
 
     schema = JSON.parse(await zip.file(manifest.schema).async("string"));
 
+    data = {};
+
     if (manifest.data && zip.file(manifest.data))
     {
         data = JSON.parse(await zip.file(manifest.data).async("string"));
-    }
-    else
-    {
-        data = {};
     }
 
     const container = document.getElementById("container");
@@ -37,14 +41,18 @@ async function openForm(event)
     {
         const svgText = await zip.file(svgPath).async("string");
 
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(svgText, "image/svg+xml");
+
+        const svg = doc.documentElement;
+
         const wrapper = document.createElement("div");
-        wrapper.innerHTML = svgText;
+        wrapper.className = "page";
+        wrapper.appendChild(svg);
 
-        const svg = wrapper.querySelector("svg");
+        container.appendChild(wrapper);   // move this line up
 
-        renderFields(svg);
-
-        container.appendChild(wrapper);
+        renderFields(svg);                // run after DOM insertion
     }
 }
 
