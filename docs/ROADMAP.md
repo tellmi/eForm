@@ -1,12 +1,6 @@
-
----
-
-# ROADMAP.md
-
-Version: 0.1
-
-```markdown
 # eForm Project Roadmap
+
+Version: 0.2
 
 This document outlines the planned development stages of the eForm project.
 
@@ -18,18 +12,30 @@ The goal is to evolve the format gradually while keeping the core specification 
 
 Status: completed
 
-The initial prototype demonstrates the core architecture.
+The initial prototype demonstrates the core architecture of the eForm format.
 
 Completed work:
 
-- container format defined
+- container architecture defined
+- hybrid file structure (`preview.svg + ZIP`)
+- MIME type definition
 - SVG layout concept
 - field anchor mechanism
 - schema definition
+- data model (`data.json`)
 - example form
+- form packer script
 - basic viewer prototype
 
-The format is now functionally demonstrable.
+The viewer can now:
+
+- open `.eform` documents
+- render SVG layouts
+- detect field anchors
+- edit field values
+- update `data.json`
+
+The format is now **functionally demonstrable**.
 
 ---
 
@@ -39,29 +45,38 @@ Focus: enabling real-world usage.
 
 Planned work:
 
-viewer improvements
+## Viewer improvements
 
 - inline text editing
 - cursor support
 - keyboard navigation
+- zoom controls
+- improved field highlighting
 
-editing features
+## Editing features
 
 - update `data.json`
+- regenerate `preview.svg`
 - rebuild `.eform` container
 
-field rendering
+## Field rendering
+
+Support additional field types:
 
 - checkbox fields
 - radio button groups
 - dropdown selections
 - date fields
 
-validation hints
+## Validation hints
 
-- maxLength
-- pattern
-- required
+Viewer-side guidance for schema hints:
+
+- `maxLength`
+- `pattern`
+- `required`
+
+Server-side validation remains the responsibility of receiving systems.
 
 ---
 
@@ -76,6 +91,9 @@ Planned additions:
 - additional example forms
 - improved documentation
 - schema registry examples
+- form validation examples
+
+This phase aims to make the format easier to adopt by developers.
 
 ---
 
@@ -89,6 +107,8 @@ Goals:
 - define SVG restrictions
 - clarify schema semantics
 - improve compatibility rules
+- stabilize MIME type definition
+- document hybrid container behavior
 
 Once stabilized, the specification may reach **version 1.0**.
 
@@ -122,6 +142,8 @@ Possible features:
 - supporting documents
 - case metadata
 
+These profiles extend the base eForm architecture without modifying the core specification.
+
 ---
 
 # Long-Term Vision
@@ -135,4 +157,8 @@ Potential future areas include:
 - business form exchange
 - structured document archives
 
-The project prioritizes **simplicity, durability, and openness**.
+The project prioritizes:
+
+- simplicity
+- durability
+- openness

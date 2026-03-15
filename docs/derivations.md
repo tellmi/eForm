@@ -1,6 +1,6 @@
 # eForm Format Derivations
 
-Version: 0.1
+Version: 0.2
 
 ---
 
@@ -18,19 +18,21 @@ Examples include:
 - case files
 - document bundles
 
+Derived formats inherit the base eForm architecture and may define additional constraints or conventions.
+
 ---
 
 ## 2. Design Philosophy
 
-The base eForm format focuses on:
+The base eForm format focuses on three core concepts:
 
 visual layout  
 structured form data  
-machine-readable schema
+machine-readable schema  
 
 Complex workflows, attachments, or domain-specific rules are intentionally excluded from the core format.
 
-Derived formats may define additional conventions.
+Derived formats may define additional rules while remaining compatible with the eForm container structure.
 
 ---
 
@@ -49,24 +51,36 @@ Typical requirements may include:
 
 Example structure:
 
+~~~text
 invoice.ebill
 
-├ manifest.json  
-├ schema.json  
-├ data.json  
-├ layout/  
-│   invoice.svg  
+preview.svg
+
+[ZIP container]
+
+mimetype
+manifest.json
+schema.json
+data.json
+
+layout/
+  invoice.svg
+
+registries/
+~~~
 
 The manifest may include a profile identifier.
 
 Example:
 
+~~~json
 {
   "type": "open-eform",
   "profile": "ebill"
 }
+~~~
 
-Specialized software may validate that required fields are present.
+Specialized software may validate that required fields are present and conform to the invoice profile.
 
 ---
 
@@ -84,23 +98,27 @@ An eCase may include:
 
 Example structure:
 
+~~~text
 case.ecase
 
-├ manifest.json  
-├ forms/  
-│   application.eform  
-│   tax.eform  
-│
-├ documents/  
-│   passport.pdf  
-│   contract.pdf  
+manifest.json
 
-The eCase container may also use ZIP packaging.
+forms/
+  application.eform
+  tax.eform
+
+documents/
+  passport.pdf
+  contract.pdf
+~~~
+
+The eCase container typically uses ZIP packaging.
 
 The manifest describes the contents of the case.
 
 Example:
 
+~~~json
 {
   "type": "open-ecase",
   "version": "1.0",
@@ -111,6 +129,7 @@ Example:
     "documents/passport.pdf"
   ]
 }
+~~~
 
 ---
 
@@ -119,6 +138,8 @@ Example:
 Derived formats must remain compatible with the base eForm specification.
 
 Software that understands only eForm should still be able to extract and render individual forms contained in derived formats.
+
+Derived formats should therefore avoid modifying the fundamental structure of eForm documents.
 
 ---
 
@@ -129,5 +150,6 @@ Possible future derivatives include:
 - application packages
 - legal filing bundles
 - invoice archives
+- document exchange containers
 
 The eForm specification intentionally keeps the base format minimal to allow such extensions.

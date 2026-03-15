@@ -1,6 +1,6 @@
 # eForm Schema Specification
 
-Version: 0.2
+Version: 0.3
 
 ---
 
@@ -24,7 +24,7 @@ Field positions are defined in the SVG layout using field anchors.
 
 Example field definition:
 
-```json
+~~~json
 {
   "fields": {
     "firstname": {
@@ -34,15 +34,13 @@ Example field definition:
     }
   }
 }
-```
+~~~
 
 Each field must correspond to a field anchor in the SVG layout.
 
 Example anchor:
 
-```
-&lt;rect data-eform-field="firstname"/&gt;
-```
+`<rect data-eform-field="firstname"/>`
 
 ---
 
@@ -57,35 +55,49 @@ Example anchor:
 | pattern | optional validation pattern |
 | codeList | reference to a standard value list |
 
+These properties provide **validation hints and semantic context** for form filling software.
+
+They do not replace validation performed by receiving systems.
+
 ---
 
 ## 4. Field Types
 
 Supported field types:
 
-```
+~~~text
 string
 number
 date
 boolean
 selection
-```
+~~~
 
 Viewers may render different UI widgets depending on the field type.
+
+Examples:
+
+- `string` → text input  
+- `number` → numeric input  
+- `date` → date input or formatted text field  
+- `boolean` → checkbox  
+- `selection` → dropdown or list selection  
 
 ---
 
 ## 5. Validation Hints
 
-Validation hints guide the form filling software but do not replace server-side validation.
+Validation hints guide form filling software but do not enforce strict validation rules.
 
 Examples:
 
-```
+~~~text
 maxLength
 pattern
 required
-```
+~~~
+
+Receiving systems remain responsible for final validation of submitted data.
 
 ---
 
@@ -95,20 +107,24 @@ Fields may reference external standards using registries.
 
 Example:
 
-```json
+~~~json
 {
   "birthcountry": {
     "type": "selection",
     "codeList": "std_iso3166"
   }
 }
-```
+~~~
 
 The referenced registry must be defined in:
 
-```
+~~~text
 registries/standards.json
-```
+~~~
+
+Registries provide references to standardized code lists or classification systems.
+
+The actual code list values may be provided by external systems or form filling software.
 
 ---
 
@@ -118,7 +134,7 @@ The key of each field entry represents the **field identifier**.
 
 Example:
 
-```json
+~~~json
 {
   "fields": {
     "firstname": {
@@ -126,7 +142,7 @@ Example:
     }
   }
 }
-```
+~~~
 
 This identifier is used consistently across the document:
 
@@ -134,30 +150,49 @@ This identifier is used consistently across the document:
 - in the SVG layout
 - in `data.json`
 
+Field identifiers should remain **stable across form revisions** to ensure compatibility with previously stored data.
+
 ---
 
-## 8. Field Anchor Mapping
+## 8. Data Mapping
+
+Field values are stored in `data.json`.
+
+Example:
+
+~~~json
+{
+  "firstname": "Anna",
+  "lastname": "Müller"
+}
+~~~
+
+Each key corresponds to a field identifier defined in the schema.
+
+Viewers use this mapping to populate field anchors in the layout.
+
+---
+
+## 9. Field Anchor Mapping
 
 Each schema field must correspond to a field anchor in the SVG layout.
 
 The mapping is defined using the attribute:
 
-```
+~~~text
 data-eform-field
-```
+~~~
 
 Example:
 
 Schema field:
 
-```
+~~~text
 firstname
-```
+~~~
 
 SVG anchor:
 
-```
-&lt;rect data-eform-field="firstname"/&gt;
-```
+`<rect data-eform-field="firstname"/>`
 
 Viewers use this mapping to connect schema semantics with layout geometry.

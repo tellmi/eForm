@@ -1,6 +1,6 @@
 # eForm Concept
 
-Version: 0.1
+Version: 0.2
 
 eForm is an open document format for electronic forms.
 
@@ -52,7 +52,7 @@ No proprietary technologies are required.
 
 An eForm must remain understandable even without specialized software.
 
-Opening the layout SVG should still show a printable form.
+Opening the preview SVG should still show a printable form.
 
 This mirrors the behavior of traditional paper forms.
 
@@ -80,22 +80,31 @@ This allows:
 
 # Architecture
 
-An `.eform` file is a ZIP container.
+An `.eform` file combines a **static preview document** and a **ZIP container** containing the editable form resources.
 
-Example:
+Conceptual structure:
 
+~~~text
 form.eform
 
-├ mimetype  
-├ manifest.json  
-├ schema.json  
-├ data.json  
+preview.svg
 
-├ layout/  
-│   page1.svg  
+[ZIP container]
 
-├ view/  
-│   page1-filled.svg  
+mimetype
+manifest.json
+schema.json
+data.json
+
+layout/
+  page1.svg
+
+registries/
+~~~
+
+The preview SVG ensures that the document remains readable even without specialized eForm software.
+
+The ZIP container stores the structured resources used by viewers and editors.
 
 ---
 
@@ -104,41 +113,47 @@ form.eform
 Form fields are defined directly inside the SVG layout using **field anchors**.
 
 Example:
-<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/> ```
+
+`<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>`
 
 The attribute connects the visual layout to the schema definition.
 
-## Viewer Model
+---
+
+# Viewer Model
 
 A viewer processes an eForm using the following steps:
 
-1 load container
-2 read manifest
-3 load layout
-4 detect field anchors
-5 load schema
-6 display values from data.json
+1. read the ZIP container  
+2. load `manifest.json`  
+3. load layout SVG pages  
+4. detect field anchors  
+5. load schema definitions  
+6. populate values from `data.json`  
 
 This model allows viewer implementations to remain small and simple.
 
-## Optional Extensions
+---
+
+# Optional Extensions
 
 The core eForm format intentionally avoids complex features.
 
 More specialized use cases may define derived formats, such as:
 
-    .ebill — structured invoice profile
-
-    .ecase — case container for multiple documents
+- `.ebill` — structured invoice profile
+- `.ecase` — case container for multiple documents
 
 These formats extend eForm while keeping the core specification stable.
 
-## Project Goals
+---
+
+# Project Goals
 
 The long-term goal of the project is to provide a simple open format that combines:
 
-PDF-like layout stability
-web-style openness
-machine-readable data
+- PDF-like layout stability  
+- web-style openness  
+- machine-readable data  
 
 eForm aims to make digital forms easier to design, exchange, and process.

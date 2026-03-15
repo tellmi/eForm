@@ -1,6 +1,6 @@
 # eForm Layout Specification
 
-Version: 0.2
+Version: 0.3
 
 ---
 
@@ -26,8 +26,10 @@ Each page of a form is represented by one SVG file.
 
 Example:
 
-layout/page1.svg  
+~~~text
+layout/page1.svg
 layout/page2.svg
+~~~
 
 Each SVG file should represent one printable page.
 
@@ -41,11 +43,12 @@ Pages should define real-world dimensions.
 
 Example:
 
-```
-&lt;svg width="210mm" height="297mm"&gt;
-```
+`<svg width="210mm" height="297mm">`
 
 Using physical units ensures predictable printing.
+
+Coordinates inside the SVG layout should use the **same real-world units** as the page size (typically millimeters).  
+This ensures that layout geometry corresponds directly to printable paper dimensions.
 
 ---
 
@@ -85,15 +88,13 @@ Form fields are defined directly inside the SVG layout.
 
 A field anchor is an SVG element containing the attribute:
 
-```
+~~~text
 data-eform-field
-```
+~~~
 
 Example:
 
-```
-&lt;rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/&gt;
-```
+`<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>`
 
 The value must match a field defined in `schema.json`.
 
@@ -110,7 +111,9 @@ For rectangular fields:
 - width
 - height
 
-Units should use millimeters.
+Units should typically use **millimeters** to match the page dimensions.
+
+The geometry defined in the layout represents the **interactive area** used by viewers for editing.
 
 ---
 
@@ -120,11 +123,11 @@ Field anchors may serve as visible placeholders.
 
 Example:
 
-```
-&lt;rect class="field" data-eform-field="firstname" x="70" y="65" width="100" height="10"/&gt;
-```
+`<rect class="field" data-eform-field="firstname" x="70" y="65" width="100" height="10"/>`
 
 This ensures the form remains understandable even without a viewer.
+
+Designers may style these elements using CSS classes inside the SVG document.
 
 ---
 
@@ -134,11 +137,13 @@ Fonts may be embedded in the container.
 
 Example directory:
 
-```
+~~~text
 fonts/
-```
+~~~
 
 Embedding fonts ensures consistent rendering across systems.
+
+If fonts are not embedded, viewers should fall back to system fonts.
 
 ---
 
@@ -154,8 +159,16 @@ They may contain:
 
 The preview SVG represents the **rendered filled form** and must **not contain field anchors**.
 
+The preview is a static representation used for display when no eForm viewer is available.
+
 ---
 
 ## 11. Static Readability
 
 Even without specialized software, the layout SVG must remain readable and printable as a normal document.
+
+Designers should therefore ensure that:
+
+- labels remain visible
+- field areas remain understandable
+- the document structure resembles a traditional paper form

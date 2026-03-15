@@ -1,6 +1,6 @@
 # eForm Specification
 
-Version: 0.2  
+Version: 0.3  
 Status: Draft  
 Project: open-eform
 
@@ -49,36 +49,50 @@ Final validation is the responsibility of the receiving system.
 
 ### Graceful degradation
 
-Without specialized software the document must remain readable.
+Without specialized software:
 
-This is achieved through a static SVG preview of the filled form.
+- the filled form must remain readable
+- the document must remain printable
+
+This is achieved through a static SVG preview embedded at the beginning of the file.
 
 ---
 
 ## 3. File Structure
 
-An `.eform` file is a ZIP container.
+An `.eform` file consists of two parts:
+
+1. a **static SVG preview document**
+2. a **ZIP container containing the form resources**
 
 Example structure:
 
-form.eform
-│
-├ mimetype
-├ manifest.json
-├ schema.json
-├ data.json
-│
-├ preview.svg
-│
-├ layout/
-│ page1.svg
-│
-└ registries/
+form.eform  
+│  
+├ preview.svg  
+│  
+├ manifest.json  
+├ schema.json  
+├ data.json  
+│  
+├ layout/  
+│ page1.svg  
+│  
+└ registries/  
 
-
-The preview SVG contains a static rendering of the filled form and allows the document to remain readable without specialized software.
+The preview SVG allows the document to remain readable without specialized software.
 
 The ZIP container stores the structured form resources used by viewers and editors.
+
+The preview SVG may be followed by an open XML comment so that the ZIP container can be appended to the file.
+
+Example physical layout:
+
+<svg>...</svg>  
+<!-- eform-container -->  
+[ZIP archive]
+
+ZIP readers locate the archive from the end of the file, so additional data before the archive does not affect extraction.
 
 ---
 
@@ -86,21 +100,18 @@ The ZIP container stores the structured form resources used by viewers and edito
 
 ### Preview
 
-The preview is a static SVG representation of the filled form.
+The preview is a static SVG document placed at the beginning of the file.
 
-The preview:
+It represents the **rendered filled form**.
 
-- contains the complete visual representation of the document
+Characteristics:
+
+- contains the complete visual representation
 - may contain multiple pages
-- must not contain field anchors
-- must not contain scripts or external resources
+- contains no field anchors
+- contains no scripts or external resources
 
-The preview ensures that the document remains readable even without eForm software.
-
-The preview SVG may end with an open XML comment so that
-additional container data can follow the document.
-
----
+The preview allows the document to remain readable even if no eForm software exists.
 
 ### Layout
 
@@ -115,8 +126,6 @@ The layout is the authoritative source for:
 
 Field anchors are defined directly in the SVG layout.
 
----
-
 ### Schema
 
 The schema defines logical field properties such as:
@@ -127,8 +136,6 @@ The schema defines logical field properties such as:
 
 The schema does **not define layout geometry**.
 
----
-
 ### Data
 
 The data file stores the current field values.
@@ -136,11 +143,10 @@ The data file stores the current field values.
 Example:
 
 {
-"firstname": "Anna"
+  "firstname": "Anna"
 }
 
-
----
+Each key corresponds to a field identifier defined in `schema.json`.
 
 ### Registries (Optional)
 
@@ -152,46 +158,62 @@ Registries provide reusable references such as:
 These registries may reference external standards.
 
 ---
-## 5. MIME Type
 
-The MIME type for eForm documents is:
+## 5. Multi-Page Documents
 
-application/eform+zip
+Forms may contain multiple pages.
 
-The container must include a file named `mimetype` as the first entry
-in the ZIP archive.
+The editable layout may therefore contain multiple SVG files:
 
-The file must contain exactly the MIME type string and must not be
-compressed.
+layout/page1.svg  
+layout/page2.svg  
+layout/page3.svg  
+
+The preview SVG contains all pages rendered sequentially.
+
+Pages are typically stacked vertically within the preview document.
+
+---
 
 ## 6. Compatibility
 
 eForm is designed so that:
 
-- operating systems can display the preview SVG directly
-- browsers can display the document without specialized software
+- browsers can display the preview SVG directly
+- operating systems can display the document without specialized software
 - specialized software can provide interactive editing
 
-A viewer reads the container to access schema, data, and layout resources.
+A viewer reads the ZIP container to access schema, data, and layout resources.
 
 ---
 
-## 7. Versioning
+## 7. MIME Type
+
+The MIME type for eForm documents is:
+
+application/eform+zip
+
+The ZIP container must include a file named `mimetype` as the first entry in the archive.
+
+The file must contain exactly the MIME type string and must not be compressed.
+
+---
+
+## 8. Versioning
 
 The specification uses semantic versioning.
 
-0.x experimental
-1.x stable
-
+0.x experimental  
+1.x stable  
 
 The manifest must include the specification version.
 
 ---
 
-## 8. Terminology
+## 9. Terminology
 
 | Term | Meaning |
-|-----|------|
+|------|--------|
 | eForm | document container |
 | Viewer | software rendering and editing the form |
 | Schema | logical field definition |
@@ -201,24 +223,6 @@ The manifest must include the specification version.
 
 ---
 
-## 9. Project Status
+## 10. Project Status
 
 This specification is experimental and subject to change.
-
-Change Log (building for your commit)
-
-Current tracked changes:
-
-SPEC REFACTOR (draft)
-
-Architecture
-- remove view/ directory concept
-- introduce preview.svg static rendering
-- simplify container structure
-
-Specification
-- clarify preview vs layout responsibilities
-- simplify data.json example
-
-Compatibility
-- allow direct rendering via preview.svg
