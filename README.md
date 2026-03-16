@@ -1,6 +1,6 @@
 # eForm
 
-Version: 0.3
+Version: 0.4
 
 **eForm** is an open document format for electronic forms.
 
@@ -32,13 +32,21 @@ Opening the document should still show a printable form.
 
 ---
 
+## Specification Version
+
+The current specification version is defined in this document.
+
+All files in the `spec/` directory belong to this specification version.
+
+---
+
 ## Core Technologies
 
 eForm intentionally uses simple and widely supported technologies:
 
 - **SVG** for visual form layout and preview
 - **ZIP container** for packaging structured resources
-- **JSON** for schema and form data
+- **JSON** for schema, form data, and optional computation rules
 
 These technologies ensure the format remains readable and easy to implement.
 
@@ -55,21 +63,18 @@ Conceptual structure:
 
 ```
 form.eform
-
-preview.svg
-
-[ZIP container]
-
-mimetype
-manifest.json
-schema.json
-data.json
-
-layout/
-  page1.svg
-
-registries/
-  standards.json
+├ preview.svg
+└ [ZIP container]
+   ├ mimetype
+   ├ manifest.json
+   ├ schema.json
+   ├ data.json
+   ├ layout/
+   │   └ page1.svg
+   ├ formulas/
+   │   └ formulas.json
+   └ registries/
+       └ standards.json
 ```
 
 ### Preview
@@ -88,6 +93,22 @@ The **schema** describes field types and validation hints.
 
 The **data file** stores the current values of the form fields.
 
+### Formulas (Optional)
+
+The **formulas** component defines relationships between fields.
+
+Formulas may automatically compute values based on other fields.
+
+Example:
+
+```
+f3 = f1 - f2
+```
+
+These calculations help reduce input errors and simplify form filling.
+
+Formulas are optional and do not replace server-side validation.
+
 ---
 
 ## Field Anchors
@@ -97,7 +118,7 @@ Form fields are defined directly in the SVG layout using **field anchors**.
 Example:
 
 ```
-<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>
+<rect data-eform-field="f1" x="70" y="65" width="100" height="10"/>
 ```
 
 The `data-eform-field` attribute links the visual layout to the field defined in `schema.json`.
@@ -115,8 +136,9 @@ A viewer processes an eForm roughly as follows:
 5. detect field anchors  
 6. match them with `schema.json`  
 7. display values from `data.json`  
+8. apply optional formulas to compute derived values  
 
-This design keeps viewer implementations simple.
+This design keeps viewer implementations simple while enabling automated calculations.
 
 ---
 

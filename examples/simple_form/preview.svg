@@ -1,6 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg"
-     width="210mm"
-     height="297mm"
      viewBox="0 0 794 1123">
 
   <style>
@@ -8,6 +6,12 @@
     .title { font-size: 6mm; font-weight: bold; }
   </style>
 
+  
+  <rect x="0" y="0" width="794" height="1123"
+        fill="rgba(255,0,0,0.05)"
+        stroke="red"
+        stroke-width="2"/>
+    
   <text class="title" x="20" y="30">Example eForm – Simple Registration</text>
 
   <text x="20" y="60">First name</text>

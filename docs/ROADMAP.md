@@ -1,7 +1,5 @@
 # eForm Project Roadmap
 
-Version: 0.2
-
 This document outlines the planned development stages of the eForm project.
 
 The goal is to evolve the format gradually while keeping the core specification stable and simple.
@@ -26,6 +24,7 @@ Completed work:
 - example form
 - form packer script
 - basic viewer prototype
+- optional formulas concept introduced
 
 The viewer can now:
 
@@ -68,6 +67,14 @@ Support additional field types:
 - dropdown selections
 - date fields
 
+## Computation support
+
+Implement optional formula evaluation:
+
+- automatic calculation of derived fields
+- live recalculation when input values change
+- display of computed read-only fields
+
 ## Validation hints
 
 Viewer-side guidance for schema hints:
@@ -106,6 +113,7 @@ Goals:
 - finalize container structure
 - define SVG restrictions
 - clarify schema semantics
+- define formula syntax and behavior
 - improve compatibility rules
 - stabilize MIME type definition
 - document hybrid container behavior
@@ -129,6 +137,7 @@ Possible features:
 - standardized invoice fields
 - code list references
 - validation profiles
+- automatic total calculations
 
 ---
 

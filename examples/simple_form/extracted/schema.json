@@ -1,23 +1,42 @@
 {
   "fields": {
-    "firstname": {
+    "f1": {
+      "name": "firstname",
       "type": "string",
       "label": "First name",
       "maxLength": 40
     },
-    "lastname": {
+    "f2": {
+      "name": "lastname",
       "type": "string",
       "label": "Last name",
       "maxLength": 40
     },
-    "birthdate": {
+    "f3": {
+      "name": "birthdate",
       "type": "date",
       "label": "Birth date"
     },
-    "birthcountry": {
+    "f4": {
+      "name": "birthcountry",
       "type": "selection",
       "label": "Birth country",
       "codeList": "std_iso3166"
+    },
+    "f5": {
+      "name": "income",
+      "type": "number",
+      "label": "Income"
+    },
+    "f6": {
+      "name": "expenses",
+      "type": "number",
+      "label": "Expenses"
+    },
+    "f7": {
+      "name": "profit",
+      "type": "number",
+      "label": "Profit"
     }
   }
 }

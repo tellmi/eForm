@@ -1,7 +1,5 @@
 # eForm Schema Specification
 
-Version: 0.3
-
 ---
 
 ## 1. Purpose
@@ -27,7 +25,7 @@ Example field definition:
 ~~~json
 {
   "fields": {
-    "firstname": {
+    "f1": {
       "type": "string",
       "label": "First name",
       "maxLength": 40
@@ -40,7 +38,9 @@ Each field must correspond to a field anchor in the SVG layout.
 
 Example anchor:
 
-`<rect data-eform-field="firstname"/>`
+~~~text
+<rect data-eform-field="f1"/>
+~~~
 
 ---
 
@@ -109,7 +109,7 @@ Example:
 
 ~~~json
 {
-  "birthcountry": {
+  "f4": {
     "type": "selection",
     "codeList": "std_iso3166"
   }
@@ -137,7 +137,7 @@ Example:
 ~~~json
 {
   "fields": {
-    "firstname": {
+    "f1": {
       "type": "string"
     }
   }
@@ -149,6 +149,7 @@ This identifier is used consistently across the document:
 - in the schema
 - in the SVG layout
 - in `data.json`
+- in optional formulas
 
 Field identifiers should remain **stable across form revisions** to ensure compatibility with previously stored data.
 
@@ -162,8 +163,8 @@ Example:
 
 ~~~json
 {
-  "firstname": "Anna",
-  "lastname": "Müller"
+  "f1": "Anna",
+  "f2": "Müller"
 }
 ~~~
 
@@ -188,11 +189,37 @@ Example:
 Schema field:
 
 ~~~text
-firstname
+f1
 ~~~
 
 SVG anchor:
 
-`<rect data-eform-field="firstname"/>`
+~~~text
+<rect data-eform-field="f1"/>
+~~~
 
 Viewers use this mapping to connect schema semantics with layout geometry.
+
+---
+
+## 10. Computed Fields (Optional)
+
+Fields may be computed using optional formulas defined in:
+
+~~~text
+formulas/formulas.json
+~~~
+
+Example formula:
+
+~~~text
+f3 = f1 - f2
+~~~
+
+Computed fields represent **derived values** based on other fields.
+
+Viewers may automatically calculate these values and update them when source fields change.
+
+Computed fields are typically treated as **read-only** in user interfaces.
+
+Formulas assist form filling but do not replace validation performed by receiving systems.

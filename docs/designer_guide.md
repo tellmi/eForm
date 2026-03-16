@@ -1,7 +1,5 @@
 # eForm Designer Guide
 
-Version: 0.2
-
 This guide explains how to create eForm layouts using standard vector design tools such as **Inkscape**.
 
 The visual layout of an eForm is stored as **SVG**.
@@ -77,9 +75,9 @@ data-eform-field
 
 Example:
 
-`<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>`
+`<rect data-eform-field="f1" x="70" y="65" width="100" height="10"/>`
 
-The value must match a field name defined in `schema.json`.
+The value must match a field identifier defined in `schema.json`.
 
 This attribute creates the mapping between:
 
@@ -95,7 +93,7 @@ Example snippet:
 
 ~~~text
 <text x="20" y="60">First name</text>
-<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>
+<rect data-eform-field="f1" x="70" y="65" width="100" height="10"/>
 ~~~
 
 When rendered by a viewer, the rectangle becomes an editable field.
@@ -152,6 +150,8 @@ data-eform-field
 ~~~
 
 and attaches interactive editing behavior automatically.
+
+If formulas are defined in the form container, viewers may also compute derived field values automatically during form filling.
 
 This separation allows the same form to be:
 

@@ -1,11 +1,12 @@
 {
   "type": "open-eform",
-  "version": "0.1",
+  "version": "0.4",
   "layout": [
     "layout/page1.svg"
   ],
   "schema": "schema.json",
   "data": "data.json",
+  "formulas": "formulas/formulas.json",
   "registries": [
     "registries/standards.json"
   ]

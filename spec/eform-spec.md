@@ -1,6 +1,5 @@
 # eForm Specification
 
-Version: 0.3  
 Status: Draft  
 Project: open-eform
 
@@ -30,8 +29,8 @@ Documents must remain readable decades later.
 
 This is achieved through the use of widely supported technologies:
 
+- SVG
 - ZIP container
-- SVG layout
 - JSON metadata
 
 ### Self-contained documents
@@ -67,18 +66,25 @@ An `.eform` file consists of two parts:
 
 Example structure:
 
-form.eform  
-│  
-├ preview.svg  
-│  
-├ manifest.json  
-├ schema.json  
-├ data.json  
-│  
-├ layout/  
-│ page1.svg  
-│  
-└ registries/  
+~~~text
+form.eform
+│
+├ preview.svg
+│
+└ [ZIP container]
+   ├ mimetype
+   ├ manifest.json
+   ├ schema.json
+   ├ data.json
+   │
+   ├ layout/
+   │   page1.svg
+   │
+   ├ formulas/
+   │   formulas.json
+   │
+   └ registries/
+~~~
 
 The preview SVG allows the document to remain readable without specialized software.
 
@@ -88,9 +94,11 @@ The preview SVG may be followed by an open XML comment so that the ZIP container
 
 Example physical layout:
 
-<svg>...</svg>  
-<!-- eform-container -->  
+~~~text
+<svg>...</svg>
+<!-- eform-container -->
 [ZIP archive]
+~~~
 
 ZIP readers locate the archive from the end of the file, so additional data before the archive does not affect extraction.
 
@@ -113,6 +121,8 @@ Characteristics:
 
 The preview allows the document to remain readable even if no eForm software exists.
 
+---
+
 ### Layout
 
 The layout defines the editable structure of the form.
@@ -126,6 +136,8 @@ The layout is the authoritative source for:
 
 Field anchors are defined directly in the SVG layout.
 
+---
+
 ### Schema
 
 The schema defines logical field properties such as:
@@ -136,17 +148,89 @@ The schema defines logical field properties such as:
 
 The schema does **not define layout geometry**.
 
+---
+
 ### Data
 
 The data file stores the current field values.
 
 Example:
 
+~~~json
 {
-  "firstname": "Anna"
+  "f1": "Anna"
 }
+~~~
 
 Each key corresponds to a field identifier defined in `schema.json`.
+
+---
+
+### Formulas (Optional)
+
+The formulas component defines relationships between fields.
+
+Formulas allow automatic computation of derived values based on other field values.
+
+Example:
+
+f7 = f5 - f6
+
+Formulas assist form filling software and reduce the risk of incorrect user input.
+
+Formulas are optional and do not replace validation performed by receiving systems.
+
+---
+
+### Stored Values and Recalculation
+
+Computed field values may be stored in `data.json`.
+
+These stored values represent the value of the field at the time the form was last saved.
+
+Example:
+
+~~~json
+{
+  "f5": 5000,
+  "f6": 3200,
+  "f7": 1800
+}
+~~~
+
+Software processing an eForm should recompute formula results when formulas are present.
+
+If a stored value differs from the recomputed result, the recomputed value should be considered authoritative.
+
+Importers may ignore stored values for computed fields and rely on recomputed results.
+
+This behavior allows:
+
+- consistent validation
+- detection of modified or inconsistent data
+- compatibility with systems that do not evaluate formulas
+
+---
+
+### Deterministic Evaluation
+
+Formulas must be deterministic and side-effect free.
+
+Formula evaluation must depend only on the values of referenced fields.
+
+Implementations must not rely on:
+
+- external data sources
+- random number generation
+- system time
+- environment-dependent values
+
+This requirement ensures that all implementations compute identical results.
+
+The syntax and evaluation rules of formulas are defined in the
+Formula Specification document.
+
+---
 
 ### Registries (Optional)
 
@@ -165,9 +249,11 @@ Forms may contain multiple pages.
 
 The editable layout may therefore contain multiple SVG files:
 
-layout/page1.svg  
-layout/page2.svg  
-layout/page3.svg  
+~~~text
+layout/page1.svg
+layout/page2.svg
+layout/page3.svg
+~~~
 
 The preview SVG contains all pages rendered sequentially.
 
@@ -183,7 +269,7 @@ eForm is designed so that:
 - operating systems can display the document without specialized software
 - specialized software can provide interactive editing
 
-A viewer reads the ZIP container to access schema, data, and layout resources.
+A viewer reads the ZIP container to access schema, data, layout resources, and optional formulas.
 
 ---
 
@@ -191,7 +277,9 @@ A viewer reads the ZIP container to access schema, data, and layout resources.
 
 The MIME type for eForm documents is:
 
+~~~text
 application/eform+zip
+~~~
 
 The ZIP container must include a file named `mimetype` as the first entry in the archive.
 
@@ -203,10 +291,12 @@ The file must contain exactly the MIME type string and must not be compressed.
 
 The specification uses semantic versioning.
 
-0.x experimental  
-1.x stable  
+~~~text
+0.x experimental
+1.x stable
+~~~
 
-The manifest must include the specification version.
+The manifest may include the specification version.
 
 ---
 

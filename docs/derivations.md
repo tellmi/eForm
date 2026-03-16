@@ -1,7 +1,5 @@
 # eForm Format Derivations
 
-Version: 0.2
-
 ---
 
 ## 1. Overview
@@ -24,11 +22,12 @@ Derived formats inherit the base eForm architecture and may define additional co
 
 ## 2. Design Philosophy
 
-The base eForm format focuses on three core concepts:
+The base eForm format focuses on four core concepts:
 
 visual layout  
 structured form data  
 machine-readable schema  
+optional computation rules  
 
 Complex workflows, attachments, or domain-specific rules are intentionally excluded from the core format.
 
@@ -48,25 +47,23 @@ Typical requirements may include:
 - standardized semantics
 - reference code lists
 - validation rules
+- optional computed totals
 
 Example structure:
 
 ~~~text
 invoice.ebill
-
-preview.svg
-
-[ZIP container]
-
-mimetype
-manifest.json
-schema.json
-data.json
-
-layout/
-  invoice.svg
-
-registries/
+├ preview.svg
+└ [ZIP container]
+   ├ mimetype
+   ├ manifest.json
+   ├ schema.json
+   ├ data.json
+   ├ layout/
+   │   └ invoice.svg
+   ├ formulas/
+   │   └ formulas.json
+   └ registries/
 ~~~
 
 The manifest may include a profile identifier.
@@ -100,16 +97,13 @@ Example structure:
 
 ~~~text
 case.ecase
-
-manifest.json
-
-forms/
-  application.eform
-  tax.eform
-
-documents/
-  passport.pdf
-  contract.pdf
+├ manifest.json
+├ forms/
+│   ├ application.eform
+│   └ tax.eform
+└ documents/
+    ├ passport.pdf
+    └ contract.pdf
 ~~~
 
 The eCase container typically uses ZIP packaging.

@@ -1,7 +1,5 @@
 # eForm Layout Specification
 
-Version: 0.3
-
 ---
 
 ## 1. Purpose
@@ -43,11 +41,14 @@ Pages should define real-world dimensions.
 
 Example:
 
-`<svg width="210mm" height="297mm">`
+~~~text
+<svg width="210mm" height="297mm">
+~~~
 
 Using physical units ensures predictable printing.
 
-Coordinates inside the SVG layout should use the **same real-world units** as the page size (typically millimeters).  
+Coordinates inside the SVG layout should use the **same real-world units** as the page size (typically millimeters).
+
 This ensures that layout geometry corresponds directly to printable paper dimensions.
 
 ---
@@ -94,9 +95,11 @@ data-eform-field
 
 Example:
 
-`<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>`
+~~~text
+<rect data-eform-field="f1" x="70" y="65" width="100" height="10"/>
+~~~
 
-The value must match a field defined in `schema.json`.
+The value must match a field identifier defined in `schema.json`.
 
 ---
 
@@ -123,7 +126,9 @@ Field anchors may serve as visible placeholders.
 
 Example:
 
-`<rect class="field" data-eform-field="firstname" x="70" y="65" width="100" height="10"/>`
+~~~text
+<rect class="field" data-eform-field="f1" x="70" y="65" width="100" height="10"/>
+~~~
 
 This ensures the form remains understandable even without a viewer.
 

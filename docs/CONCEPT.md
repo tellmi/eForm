@@ -1,7 +1,5 @@
 # eForm Concept
 
-Version: 0.2
-
 eForm is an open document format for electronic forms.
 
 The goal of the project is to provide a simple and durable format for digital forms that combines:
@@ -16,19 +14,21 @@ An eForm behaves like a **digital equivalent of a paper form**.
 
 # Core Idea
 
-An eForm document separates three concerns:
+An eForm document separates several concerns:
 
 layout  
 schema  
 data  
+formulas (optional)
 
 | Component | Purpose |
 |--------|---------|
 | Layout (SVG) | visual form design |
 | Schema (JSON) | logical field definition |
 | Data (JSON) | current form values |
+| Formulas (JSON, optional) | relationships between fields |
 
-This separation makes the format flexible while keeping documents readable.
+This separation keeps the format flexible while maintaining readability and simplicity.
 
 ---
 
@@ -40,8 +40,8 @@ The design of eForm follows several key principles.
 
 The format is intentionally minimal and relies only on widely supported technologies:
 
+- SVG preview
 - ZIP container
-- SVG layout
 - JSON metadata
 
 No proprietary technologies are required.
@@ -78,6 +78,16 @@ This allows:
 
 ---
 
+## Assistive computation
+
+Forms may optionally include formulas that describe relationships between fields.
+
+These formulas allow form filling software to automatically compute values and reduce user errors.
+
+Formulas are optional and do not replace server-side validation.
+
+---
+
 # Architecture
 
 An `.eform` file combines a **static preview document** and a **ZIP container** containing the editable form resources.
@@ -86,20 +96,18 @@ Conceptual structure:
 
 ~~~text
 form.eform
-
-preview.svg
-
-[ZIP container]
-
-mimetype
-manifest.json
-schema.json
-data.json
-
-layout/
-  page1.svg
-
-registries/
+├ preview.svg
+└ [ZIP container]
+   ├ mimetype
+   ├ manifest.json
+   ├ schema.json
+   ├ data.json
+   ├ layout/
+   │   └ page1.svg
+   ├ formulas/
+   │   └ formulas.json
+   └ registries/
+       └ standards.json
 ~~~
 
 The preview SVG ensures that the document remains readable even without specialized eForm software.
@@ -114,7 +122,7 @@ Form fields are defined directly inside the SVG layout using **field anchors**.
 
 Example:
 
-`<rect data-eform-field="firstname" x="70" y="65" width="100" height="10"/>`
+`<rect data-eform-field="f1" x="70" y="65" width="100" height="10"/>`
 
 The attribute connects the visual layout to the schema definition.
 
@@ -124,12 +132,13 @@ The attribute connects the visual layout to the schema definition.
 
 A viewer processes an eForm using the following steps:
 
-1. read the ZIP container  
-2. load `manifest.json`  
+1. locate the embedded ZIP container  
+2. read `manifest.json`  
 3. load layout SVG pages  
 4. detect field anchors  
 5. load schema definitions  
 6. populate values from `data.json`  
+7. apply optional formulas to compute derived values  
 
 This model allows viewer implementations to remain small and simple.
 
