@@ -26,19 +26,23 @@ Field identifiers:
 
 Allowed identifier pattern:
 
+~~~text
 [A-Za-z0-9_.-]+
-
+~~~
 
 Example identifiers:
 
+~~~text
 f1
 f2
 income
 tax_rate
 invoice.total
-
+~~~
 
 Field identifiers must not contain spaces.
+
+The colon character `:` is reserved for **range expressions** and must not appear in identifiers.
 
 ---
 
@@ -48,16 +52,16 @@ Numbers must follow **JSON number syntax**.
 
 Example:
 
+~~~text
 10
 10.5
 -3.25
 0.75
-
+~~~
 
 Implementations must interpret numeric values as:
 
-IEEE 754 double precision floating point numbers
-
+**IEEE 754 double precision floating point numbers**
 
 Form filling software must be aware of floating point rounding behavior when performing calculations.
 
@@ -67,22 +71,27 @@ Form filling software must be aware of floating point rounding behavior when per
 
 Formulas are defined in:
 
+~~~text
 formulas/formulas.json
-
+~~~
 
 Example structure:
 
+~~~json
 {
-"formulas": {
-"f7": "f5 - f6"
+  "formulas": {
+    "f7": "f5 - f6"
+  }
 }
-}
-
+~~~
 
 This example computes:
 
+~~~text
 profit = income - expenses
+~~~
 
+The key defines the **target field** whose value is computed.
 
 ---
 
@@ -107,71 +116,119 @@ Importing systems may ignore stored values and recompute all formulas.
 
 # 5. Supported Operations
 
-The following operations must be supported by implementations.
+The following arithmetic operators must be supported:
 
-Arithmetic operators:
-
+~~~text
++
+-
+*
 /
-
+~~~
 
 Parentheses may be used for grouping.
 
 Example:
 
-f7 = (f5 - f6) * 0.2
-
+~~~text
+(f5 - f6) * 0.2
+~~~
 
 ---
 
-# 6. Range Expressions
+# 6. Operator Precedence
+
+Operators must follow this precedence order:
+
+1. Parentheses `( )`
+2. Multiplication `*` and division `/`
+3. Addition `+` and subtraction `-`
+
+Operators with the same precedence are evaluated left to right.
+
+---
+
+# 7. Formula Evaluation Order
+
+Formulas should be evaluated according to their **field dependencies**.
+
+If a formula references other fields, those fields must be evaluated first.
+
+Implementations should determine an evaluation order that respects these dependencies.
+
+Example:
+
+~~~text
+f2 = f1 * 0.2
+f3 = f1 + f2
+~~~
+
+Evaluation order:
+
+~~~text
+f1 → f2 → f3
+~~~
+
+If multiple formulas are independent, implementations may evaluate them in any order.
+
+Implementations may use the order defined in `formulas.json` as an **evaluation hint**, but must not rely on it for correctness.
+
+---
+
+# 8. Range Expressions
 
 Ranges may be expressed using a colon.
 
 Example:
 
+~~~text
 f1:f3
-
+~~~
 
 This represents the fields:
 
+~~~text
 f1, f2, f3
+~~~
 
-
-Range expressions may be used inside functions.
+Range expressions may be used inside functions and should reference fields in ascending order.
 
 ---
 
-# 7. Functions
+# 9. Functions
 
 Functions accept comma-separated arguments.
 
 Example:
 
+~~~text
 sum(f1, f2, f3)
 sum(f1:f3)
-
+~~~
 
 Supported functions:
 
+~~~text
 sum(...)
 round(value, digits)
-
+~~~
 
 Example:
 
+~~~text
 round(sum(f1:f3), 2)
-
+~~~
 
 ---
 
-# 8. Currency Rounding
+# 10. Currency Rounding
 
 Financial values frequently require rounding to a fixed number of decimal places.
 
 Example:
 
+~~~text
 round(f5 - f6, 2)
-
+~~~
 
 This ensures results match currency precision.
 
@@ -179,25 +236,28 @@ Form designers should explicitly apply rounding where required.
 
 ---
 
-# 9. Financial Calculation Recommendation
+# 11. Financial Calculation Recommendation
 
 When rounding is involved, intermediate values may differ depending on the order of calculation.
 
 Example problem:
 
+~~~text
 gross = net * (1 + tax_rate)
 tax = net * tax_rate
-
+~~~
 
 Due to rounding, the result may not equal:
 
+~~~text
 gross = net + tax
-
+~~~
 
 To avoid inconsistencies, form designers should prefer:
 
+~~~text
 gross = net + tax
-
+~~~
 
 In other words:
 
@@ -206,20 +266,22 @@ In other words:
 
 ---
 
-# 10. Splitting Complex Calculations
+# 12. Splitting Complex Calculations
 
 Complex calculations should be broken into smaller steps.
 
 Example (recommended):
 
+~~~text
 tax = round(net * tax_rate, 2)
 gross = net + tax
-
+~~~
 
 Instead of:
 
+~~~text
 gross = round(net * (1 + tax_rate), 2)
-
+~~~
 
 Splitting calculations improves:
 
@@ -229,7 +291,7 @@ Splitting calculations improves:
 
 ---
 
-# 11. Error Handling
+# 13. Error Handling
 
 If a formula references a field that does not exist, implementations should:
 
@@ -237,11 +299,30 @@ If a formula references a field that does not exist, implementations should:
 - leave the target field unchanged
 - optionally log a warning
 
+Division by zero should result in an undefined value.
+
+Implementations may leave the target field empty or unchanged.
+
 Formulas must never cause viewer crashes.
 
 ---
 
-# 12. Forward Compatibility
+# 14. Dependency Cycles
+
+If formulas create a dependency cycle, implementations should ignore the formulas involved in the cycle.
+
+Example cycle:
+
+~~~text
+f1 = f2 + 1
+f2 = f1 + 1
+~~~
+
+Implementations may report a warning but must not enter infinite evaluation loops.
+
+---
+
+# 15. Forward Compatibility
 
 Implementations must ignore unknown functions or operations.
 
@@ -249,4 +330,50 @@ This allows the formula system to evolve while maintaining compatibility.
 
 Unknown formulas may be skipped while the rest of the document remains usable.
 
----
+# 16. Formula Grammar
+
+Formulas follow a simple expression grammar.
+
+The following EBNF-style grammar defines the allowed syntax.
+
+~~~text
+expression      = term { ("+" | "-") term } ;
+
+term            = factor { ("*" | "/") factor } ;
+
+factor          = number
+                | identifier
+                | function_call
+                | "(" expression ")" ;
+
+function_call   = identifier "(" argument_list ")" ;
+
+argument_list   = expression
+                | expression { "," expression }
+                | range ;
+
+range           = identifier ":" identifier ;
+
+identifier      = letter { letter | digit | "_" | "." | "-" } ;
+
+number          = ["-"] digit { digit } [ "." digit { digit } ] ;
+
+letter          = "A"…"Z" | "a"…"z" ;
+digit           = "0"…"9" ;
+~~~
+
+Examples of valid expressions:
+
+~~~text
+f1 + f2
+f5 - f6
+(f5 - f6) * 0.2
+sum(f1:f3)
+round(sum(f1:f3), 2)
+~~~
+
+Implementations should parse formulas according to this grammar.
+
+Whitespace between tokens may be ignored.
+
+

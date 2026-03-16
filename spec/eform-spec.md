@@ -95,8 +95,8 @@ The preview SVG may be followed by an open XML comment so that the ZIP container
 Example physical layout:
 
 ~~~text
-<svg>...</svg>
-<!-- eform-container -->
+&lt;svg&gt;...&lt;/svg&gt;
+&lt;!-- eform-container --&gt;
 [ZIP archive]
 ~~~
 
@@ -121,6 +121,10 @@ Characteristics:
 
 The preview allows the document to remain readable even if no eForm software exists.
 
+The preview must visually correspond to the current values stored in `data.json`.
+
+The preview may be generated automatically from the layout and stored data.
+
 ---
 
 ### Layout
@@ -134,7 +138,95 @@ The layout is the authoritative source for:
 - page geometry
 - field positioning
 
-Field anchors are defined directly in the SVG layout.
+Layouts must not contain scripts or external resource references.
+
+---
+
+### Layout Coordinate System
+
+All layout SVG documents must use a consistent coordinate system.
+
+The following rules apply:
+
+- The origin `(0,0)` is located at the top-left corner of the page.
+- Coordinates increase to the right (x-axis) and downward (y-axis).
+- Units are interpreted as SVG user units.
+
+Layouts must define a `viewBox` attribute on the root `&lt;svg&gt;` element.
+
+Example:
+
+~~~text
+&lt;svg viewBox="0 0 210 297"&gt;
+~~~
+
+This example represents an A4 page in millimeter units.
+
+Implementations should interpret one user unit as one millimeter unless otherwise specified.
+
+Layouts must not rely on transforms or CSS rules that change the coordinate system.
+
+---
+
+### Field Anchors
+
+A field anchor defines the geometry of a form field within the layout.
+
+Any SVG element containing the attribute
+
+`data-eform-field`
+
+is considered a field anchor.
+
+Example:
+
+~~~text
+&lt;rect
+  data-eform-field="person.name"
+  x="70"
+  y="65"
+  width="100"
+  height="10"
+/&gt;
+~~~
+
+The geometry of the SVG element defines the visible area of the field.
+
+Supported anchor element types include:
+
+- rect
+- circle
+- ellipse
+- path
+- text
+
+Implementations should determine the anchor bounding box using the SVG element geometry.
+
+The bounding box defines the interactive region of the field.
+
+---
+
+### Embedded Layout Metadata
+
+Optional metadata attributes may be embedded in layout elements.
+
+Example:
+
+~~~text
+&lt;rect
+  data-eform-field="person.name"
+  data-eform-type="string"
+  data-eform-required="true"
+  x="70"
+  y="65"
+  width="100"
+  height="10"
+/&gt;
+~~~
+
+These attributes allow layouts to contain minimal self-describing field information.
+
+If a field is defined both in layout metadata and in `schema.json`, the schema definition takes precedence.
 
 ---
 
@@ -147,6 +239,29 @@ The schema defines logical field properties such as:
 - semantic references
 
 The schema does **not define layout geometry**.
+
+---
+
+### Field Identifiers
+
+Field identifiers must be unique within the document.
+
+Identifiers may use the following characters:
+
+- `a–z`
+- `A–Z`
+- `0–9`
+- `.`
+- `_`
+
+Dot notation may be used to represent hierarchical structures.
+
+Example:
+
+~~~text
+person.name
+person.address.street
+~~~
 
 ---
 
@@ -174,7 +289,9 @@ Formulas allow automatic computation of derived values based on other field valu
 
 Example:
 
+~~~text
 f7 = f5 - f6
+~~~
 
 Formulas assist form filling software and reduce the risk of incorrect user input.
 
@@ -227,8 +344,7 @@ Implementations must not rely on:
 
 This requirement ensures that all implementations compute identical results.
 
-The syntax and evaluation rules of formulas are defined in the
-Formula Specification document.
+The syntax and evaluation rules of formulas are defined in the Formula Specification document.
 
 ---
 
@@ -261,7 +377,55 @@ Pages are typically stacked vertically within the preview document.
 
 ---
 
-## 6. Compatibility
+## 6. Manifest
+
+The file `manifest.json` describes the structure of the eForm container.
+
+Example:
+
+~~~json
+{
+  "specVersion": "0.4",
+  "layout": [
+    "layout/page1.svg"
+  ],
+  "schema": "schema.json",
+  "data": "data.json",
+  "formulas": "formulas/formulas.json"
+}
+~~~
+
+Purpose:
+
+- identify core resources
+- declare document version
+- enable future extensibility
+
+The manifest must be located in the root of the ZIP container.
+
+Unknown manifest fields must be ignored by implementations.
+
+---
+
+## 7. Encoding
+
+All textual resources in an eForm document must be encoded using UTF-8.
+
+This requirement applies to:
+
+- JSON files
+- SVG files
+- manifest.json
+- schema.json
+- data.json
+
+Byte Order Marks (BOM) should not be used.
+
+Implementations must assume UTF-8 encoding when reading these files.
+
+---
+
+## 8. Compatibility
 
 eForm is designed so that:
 
@@ -271,9 +435,13 @@ eForm is designed so that:
 
 A viewer reads the ZIP container to access schema, data, layout resources, and optional formulas.
 
+Because layouts use SVG and field anchors rely on standard `data-*` attributes, layouts may also be made interactive using standard web technologies.
+
+Simple browser scripts can convert field anchors into input fields without requiring specialized software.
+
 ---
 
-## 7. MIME Type
+## 9. MIME Type
 
 The MIME type for eForm documents is:
 
@@ -287,7 +455,17 @@ The file must contain exactly the MIME type string and must not be compressed.
 
 ---
 
-## 8. Versioning
+## 10. ZIP Container Requirements
+
+The ZIP container must use the standard ZIP file format.
+
+ZIP64 is permitted.
+
+Files inside the archive should use forward-slash (`/`) path separators.
+
+---
+
+## 11. Versioning
 
 The specification uses semantic versioning.
 
@@ -300,7 +478,7 @@ The manifest may include the specification version.
 
 ---
 
-## 9. Terminology
+## 12. Terminology
 
 | Term | Meaning |
 |------|--------|
@@ -313,6 +491,6 @@ The manifest may include the specification version.
 
 ---
 
-## 10. Project Status
+## 13. Project Status
 
 This specification is experimental and subject to change.

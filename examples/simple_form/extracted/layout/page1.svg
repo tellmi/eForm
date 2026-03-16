@@ -33,51 +33,51 @@ text {
 
 <!-- First name -->
 <text x="75" y="170">First name</text>
-<g data-eform-field="f1">
+<g data-eform-field="f1" data-eform-type="string" pointer-events="bounding-box">
   <rect class="field" x="260" y="155" width="380" height="38"/>
-  <text class="value" x="270" y="182"></text>
+  <text class="value" x="270" y="182" dominant-baseline="middle"></text>
 </g>
 
 <!-- Last name -->
 <text x="75" y="250">Last name</text>
-<g data-eform-field="f2">
+<g data-eform-field="f2" data-eform-type="string" pointer-events="bounding-box">
   <rect class="field" x="260" y="235" width="380" height="38"/>
-  <text class="value" x="270" y="262"></text>
+  <text class="value" x="270" y="262" dominant-baseline="middle"></text>
 </g>
 
 <!-- Birth date -->
 <text x="75" y="330">Birth date</text>
-<g data-eform-field="f3">
+<g data-eform-field="f3" data-eform-type="date" pointer-events="bounding-box">
   <rect class="field" x="260" y="315" width="230" height="38"/>
-  <text class="value" x="270" y="342"></text>
+  <text class="value" x="270" y="342" dominant-baseline="middle"></text>
 </g>
 
 <!-- Birth country -->
 <text x="75" y="410">Birth country</text>
-<g data-eform-field="f4">
+<g data-eform-field="f4" data-eform-type="selection" pointer-events="bounding-box">
   <rect class="field" x="260" y="395" width="380" height="38"/>
-  <text class="value" x="270" y="422"></text>
+  <text class="value" x="270" y="422" dominant-baseline="middle"></text>
 </g>
 
 <!-- Income -->
 <text x="75" y="490">Income</text>
-<g data-eform-field="f5">
+<g data-eform-field="f5" data-eform-type="number" pointer-events="bounding-box">
   <rect class="field" x="260" y="475" width="230" height="38"/>
-  <text class="value" x="270" y="502"></text>
+  <text class="value" x="270" y="502" dominant-baseline="middle"></text>
 </g>
 
 <!-- Expenses -->
 <text x="75" y="570">Expenses</text>
-<g data-eform-field="f6">
+<g data-eform-field="f6" data-eform-type="number" pointer-events="bounding-box">
   <rect class="field" x="260" y="555" width="230" height="38"/>
-  <text class="value" x="270" y="582"></text>
+  <text class="value" x="270" y="582" dominant-baseline="middle"></text>
 </g>
 
 <!-- Profit -->
 <text x="75" y="650">Profit</text>
-<g data-eform-field="f7">
+<g data-eform-field="f7" data-eform-type="number" pointer-events="bounding-box">
   <rect class="field" x="260" y="635" width="230" height="38"/>
-  <text class="value" x="270" y="662"></text>
+  <text class="value" x="270" y="662" dominant-baseline="middle"></text>
 </g>
 
 </svg>

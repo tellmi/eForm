@@ -6,13 +6,9 @@
     .title { font-size: 6mm; font-weight: bold; }
   </style>
 
-  
-  <rect x="0" y="0" width="794" height="1123"
-        fill="rgba(255,0,0,0.05)"
-        stroke="red"
-        stroke-width="2"/>
-    
-  <text class="title" x="20" y="30">Example eForm – Simple Registration</text>
+  <text class="title" x="20" y="30">
+    Example eForm – Simple Registration
+  </text>
 
   <text x="20" y="60">First name</text>
   <text x="70" y="73"></text>

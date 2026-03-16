@@ -47,10 +47,10 @@ h2 {
   box-shadow: 0 6px 18px rgba(0,0,0,0.2);
 }
 
-/* ---------- SVG scaling (THIS FIXES EVERYTHING) ---------- */
+/* ---------- SVG scaling ---------- */
 
 .page svg {
-  width: 850px;        /* viewer width */
+  width: 850px;
   max-width: 100%;
   height: auto;
   display: block;
@@ -71,6 +71,15 @@ h2 {
 
 [data-eform-field]:hover rect {
   stroke: #0066ff;
+}
+
+/* ---------- drop hint ---------- */
+
+#dropHint {
+  text-align: center;
+  color: #666;
+  margin-top: 40px;
+  font-size: 14px;
 }
 
 /* ---------- buttons ---------- */
@@ -129,8 +138,39 @@ input[type="text"] {
 
 <div id="container"></div>
 
+<div id="dropHint">
+  Drop an <strong>.eform</strong> file anywhere on this page to open it.
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="viewer.js"></script>
+
+<script>
+
+/* -----------------------------------
+   URL loading trick
+   viewer.html?file=form.eform
+----------------------------------- */
+
+const params = new URLSearchParams(window.location.search);
+const fileParam = params.get("file");
+
+if (fileParam)
+{
+  fetch(fileParam)
+    .then(r => r.blob())
+    .then(blob =>
+    {
+      const file = new File([blob], fileParam);
+      loadEForm(file);
+    })
+    .catch(err =>
+    {
+      console.warn("Could not load eForm:", err);
+    });
+}
+
+</script>
 
 </body>
 </html>

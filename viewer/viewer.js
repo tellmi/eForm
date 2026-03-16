@@ -1,14 +1,39 @@
 let zip;
 let manifest;
 let schema;
-let formulas = [];
+let formulas = {};
 let data = {};
-let originalFileName = "form.eform";
+let fields = {};
 
+let originalFileName = "form.eform";
 let activeEditor = null;
 
 document.getElementById("fileInput").addEventListener("change", openForm);
 document.getElementById("saveBtn").addEventListener("click", saveForm);
+
+document.addEventListener("click", closeEditor);
+
+/* ---------------------------
+   Drag & Drop Support
+--------------------------- */
+
+document.addEventListener("dragover", e => e.preventDefault());
+
+document.addEventListener("drop", async e =>
+{
+    e.preventDefault();
+
+    const file = e.dataTransfer.files[0];
+
+    if (file)
+    {
+        await loadEForm(file);
+    }
+});
+
+/* ---------------------------
+   Open Form
+--------------------------- */
 
 async function openForm(event)
 {
@@ -16,13 +41,51 @@ async function openForm(event)
 
     if (!file) return;
 
+    await loadEForm(file);
+}
+
+/* ---------------------------
+   Load eForm (supports preview+zip)
+--------------------------- */
+
+async function loadEForm(file)
+{
     originalFileName = file.name;
 
-    zip = await JSZip.loadAsync(file);
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+
+    /* find ZIP header */
+
+    let zipStart = -1;
+
+    for (let i = 0; i < bytes.length - 3; i++)
+    {
+        if (
+            bytes[i] === 0x50 &&
+            bytes[i+1] === 0x4B &&
+            bytes[i+2] === 0x03 &&
+            bytes[i+3] === 0x04
+        )
+        {
+            zipStart = i;
+            break;
+        }
+    }
+
+    if (zipStart < 0)
+    {
+        alert("ZIP container not found in eForm file.");
+        return;
+    }
+
+    const zipData = buffer.slice(zipStart);
+
+    zip = await JSZip.loadAsync(zipData);
 
     if (!zip.file("manifest.json"))
     {
-        alert("Not a valid eForm container.");
+        alert("Invalid eForm container.");
         return;
     }
 
@@ -37,6 +100,32 @@ async function openForm(event)
         data = JSON.parse(await zip.file(manifest.data).async("string"));
     }
 
+    formulas = {};
+
+    if (manifest.formulas && zip.file(manifest.formulas))
+    {
+        try
+        {
+            const f = JSON.parse(await zip.file(manifest.formulas).async("string"));
+            formulas = f.formulas || {};
+        }
+        catch(e)
+        {
+            console.warn("Invalid formulas.json");
+        }
+    }
+
+    fields = {};
+
+    await renderLayout();
+}
+
+/* ---------------------------
+   Render Layout
+--------------------------- */
+
+async function renderLayout()
+{
     const container = document.getElementById("container");
     container.innerHTML = "";
 
@@ -49,43 +138,9 @@ async function openForm(event)
 
         const svg = doc.documentElement;
 
-        /* normalize SVG for browser rendering */
-
         svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
-        let viewBox = svg.getAttribute("viewBox");
-
-        if (!viewBox)
-        {
-            let w = svg.getAttribute("width");
-            let h = svg.getAttribute("height");
-
-            function toPx(v)
-            {
-                if (!v) return null;
-
-                if (v.endsWith("mm"))
-                    return parseFloat(v) * 96 / 25.4;
-
-                if (v.endsWith("cm"))
-                    return parseFloat(v) * 96 / 2.54;
-
-                if (v.endsWith("in"))
-                    return parseFloat(v) * 96;
-
-                return parseFloat(v);
-            }
-
-            const widthPx = toPx(w) || 794;
-            const heightPx = toPx(h) || 1123;
-
-            svg.setAttribute("viewBox", `0 0 ${widthPx} ${heightPx}`);
-        }
-
-        /* allow CSS to control display size */
-
-        svg.removeAttribute("width");
-        svg.removeAttribute("height");
+        normalizeSVG(svg);
 
         const wrapper = document.createElement("div");
         wrapper.className = "page";
@@ -96,14 +151,48 @@ async function openForm(event)
         renderFields(svg);
     }
 
-    if (zip.file("formulas/formulas.json"))
-    {
-        const f = JSON.parse(await zip.file("formulas/formulas.json").async("string"));
-        formulas = f.formulas || [];
-    }
-
     computeFormulas();
 }
+
+/* ---------------------------
+   Normalize SVG
+--------------------------- */
+
+function normalizeSVG(svg)
+{
+    let viewBox = svg.getAttribute("viewBox");
+
+    if (!viewBox)
+    {
+        const w = svg.getAttribute("width");
+        const h = svg.getAttribute("height");
+
+        const width = parseFloat(w) || 794;
+        const height = parseFloat(h) || 1123;
+
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    }
+
+    svg.removeAttribute("width");
+    svg.removeAttribute("height");
+}
+
+/* ---------------------------
+   Field Registry
+--------------------------- */
+
+function registerField(anchor)
+{
+    const id = anchor.getAttribute("data-eform-field");
+
+    if (!fields[id]) fields[id] = [];
+
+    fields[id].push(anchor);
+}
+
+/* ---------------------------
+   Render Fields
+--------------------------- */
 
 function renderFields(svg)
 {
@@ -111,33 +200,63 @@ function renderFields(svg)
 
     anchors.forEach(anchor =>
     {
+        registerField(anchor);
+
         const fieldId = anchor.getAttribute("data-eform-field");
 
         const value = data[fieldId] ?? "";
 
-        const textNode = anchor.querySelector("text");
+        updateAnchor(anchor, value);
 
-        if (!textNode) return;
-
-        textNode.textContent = value;
-
-        anchor.addEventListener("click", (event) =>
+        anchor.addEventListener("click", e =>
         {
-            event.stopPropagation();
-
-            openEditor(anchor, fieldId, textNode);
+            e.stopPropagation();
+            openEditor(anchor, fieldId);
         });
     });
 }
 
-function openEditor(anchor, fieldId, textNode)
+/* ---------------------------
+   Anchor Renderer
+--------------------------- */
+
+function updateAnchor(anchor, value)
 {
-    closeEditor();
+    const text = anchor.querySelector("text");
+
+    if (!text) return;
+
+    text.textContent = value ?? "";
+}
+
+/* ---------------------------
+   Field Update
+--------------------------- */
+
+function updateField(fieldId, value)
+{
+    data[fieldId] = value;
+
+    const anchors = fields[fieldId] || [];
+
+    anchors.forEach(anchor =>
+    {
+        updateAnchor(anchor, value);
+    });
+}
+
+/* ---------------------------
+   Editor
+--------------------------- */
+
+function openEditor(anchor, fieldId)
+{
+        closeEditor();
 
     const rect = anchor.querySelector("rect");
     if (!rect) return;
 
-    const svg = anchor.ownerSVGElement;
+    const svg = rect.ownerSVGElement;
 
     const bbox = rect.getBBox();
 
@@ -147,23 +266,23 @@ function openEditor(anchor, fieldId, textNode)
 
     const screen = pt.matrixTransform(svg.getScreenCTM());
 
+    const scrollX = window.scrollX || window.pageXOffset;
+    const scrollY = window.scrollY || window.pageYOffset;
+
     const input = document.createElement("input");
 
-    input.type = "text";
-    input.value = data[fieldId] ?? "";
-
     input.style.position = "absolute";
-    input.style.left = screen.x + "px";
-    input.style.top = screen.y + "px";
+    input.style.left = (screen.x + scrollX) + "px";
+    input.style.top = (screen.y + scrollY) + "px";
     input.style.width = bbox.width + "px";
-    input.style.fontSize = "14px";
-    input.style.padding = "2px";
+    input.style.height = bbox.height + "px";
+    input.style.boxSizing = "border-box";
 
     document.body.appendChild(input);
 
     input.focus();
 
-    activeEditor = { input, fieldId, textNode };
+    activeEditor = { input, fieldId };
 
     input.addEventListener("keydown", e =>
     {
@@ -178,13 +297,11 @@ function commitEditor()
 {
     if (!activeEditor) return;
 
-    const { input, fieldId, textNode } = activeEditor;
+    const { input, fieldId } = activeEditor;
 
     const value = input.value;
 
-    data[fieldId] = Number(value) || value;
-
-    textNode.textContent = value;
+    updateField(fieldId, Number(value) || value);
 
     document.body.removeChild(input);
 
@@ -201,6 +318,76 @@ function closeEditor()
 
     activeEditor = null;
 }
+
+/* ---------------------------
+   Formula Engine
+--------------------------- */
+
+function computeFormulas()
+{
+    for (const target in formulas)
+    {
+        try
+        {
+            const result = evaluateExpression(formulas[target]);
+
+            updateField(target, result);
+        }
+        catch (e)
+        {
+            console.warn("Formula error:", target);
+        }
+    }
+}
+
+/* ---------------------------
+   Expression Evaluation
+--------------------------- */
+
+function evaluateExpression(expr)
+{
+    expr = expandRanges(expr);
+
+    expr = expr.replace(/[A-Za-z0-9_.-]+/g, id =>
+    {
+        if (data[id] !== undefined)
+            return Number(data[id]) || 0;
+
+        return id;
+    });
+
+    expr = expr.replace(/sum\((.*?)\)/g, (_, args) =>
+    {
+        return args.split(",").map(Number).reduce((a,b)=>a+b,0);
+    });
+
+    expr = expr.replace(/round\((.*?),(.*?)\)/g, (_, val, digits) =>
+    {
+        const factor = Math.pow(10, Number(digits));
+        return Math.round(Number(val) * factor) / factor;
+    });
+
+    return Function("return " + expr)();
+}
+
+function expandRanges(expr)
+{
+    return expr.replace(/f(\d+):f(\d+)/g, (_, start, end) =>
+    {
+        const ids = [];
+
+        for (let i = Number(start); i <= Number(end); i++)
+        {
+            ids.push(`f${i}`);
+        }
+
+        return ids.join(",");
+    });
+}
+
+/* ---------------------------
+   Save Form
+--------------------------- */
 
 async function saveForm()
 {
@@ -223,95 +410,3 @@ async function saveForm()
     document.body.removeChild(link);
 }
 
-function computeFormulas()
-{
-    formulas.forEach(rule =>
-    {
-        const [target, expr] = rule.split("=").map(s => s.trim());
-
-        try
-        {
-            const result = evaluateExpression(expr);
-
-            data[target] = result;
-
-            updateField(target, result);
-        }
-        catch (e)
-        {
-            console.warn("Formula error:", rule);
-        }
-    });
-}
-
-function updateField(fieldId, value)
-{
-    const anchors = document.querySelectorAll(`[data-eform-field="${fieldId}"]`);
-
-    anchors.forEach(anchor =>
-    {
-        const text = anchor.querySelector("text");
-
-        if (text)
-        {
-            text.textContent = value;
-        }
-    });
-}
-
-function evaluateExpression(expr)
-{
-    expr = expandRanges(expr);
-
-    expr = expr.replace(/f\d+/g, id =>
-    {
-        return Number(data[id] ?? 0);
-    });
-
-    expr = expr.replace(/sum\((.*?)\)/g, (_, args) =>
-    {
-        return args.split(",").map(Number).reduce((a,b)=>a+b,0);
-    });
-
-    expr = expr.replace(/min\((.*?)\)/g, (_, args) =>
-    {
-        return Math.min(...args.split(",").map(Number));
-    });
-
-    expr = expr.replace(/max\((.*?)\)/g, (_, args) =>
-    {
-        return Math.max(...args.split(",").map(Number));
-    });
-
-    expr = expr.replace(/abs\((.*?)\)/g, (_, arg) =>
-    {
-        return Math.abs(Number(arg));
-    });
-
-    expr = expr.replace(/round\((.*?),(.*?)\)/g, (_, val, digits) =>
-    {
-        const factor = Math.pow(10, Number(digits));
-
-        return Math.round(Number(val) * factor) / factor;
-    });
-
-    return Function("return " + expr)();
-}
-
-function expandRanges(expr)
-{
-    return expr.replace(/f(\d+):f(\d+)/g, (_, start, end) =>
-    {
-        const s = Number(start);
-        const e = Number(end);
-
-        const ids = [];
-
-        for (let i = s; i <= e; i++)
-        {
-            ids.push(`f${i}`);
-        }
-
-        return ids.join(",");
-    });
-}

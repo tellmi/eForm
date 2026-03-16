@@ -30,6 +30,8 @@ An eForm document should remain readable like a paper form even without speciali
 
 Opening the document should still show a printable form.
 
+Because eForm layouts are SVG-based, documents can be displayed directly in modern web browsers without specialized software.
+
 ---
 
 ## Specification Version
@@ -61,7 +63,7 @@ An `.eform` file consists of two parts:
 
 Conceptual structure:
 
-```
+~~~text
 form.eform
 ├ preview.svg
 └ [ZIP container]
@@ -75,7 +77,11 @@ form.eform
    │   └ formulas.json
    └ registries/
        └ standards.json
-```
+~~~
+
+---
+
+## Components
 
 ### Preview
 
@@ -85,9 +91,25 @@ form.eform
 
 The **SVG layout** defines the editable structure of the form.
 
+Field positions are defined using **field anchors** embedded in the layout.
+
 ### Schema
 
-The **schema** describes field types and validation hints.
+The **schema** describes the logical structure of the form.
+
+It defines:
+
+- field types
+- validation hints
+- semantic references
+- optional **format hints** such as:
+
+~~~text
+email
+phone
+iban
+url
+~~~
 
 ### Data
 
@@ -101,9 +123,9 @@ Formulas may automatically compute values based on other fields.
 
 Example:
 
-```
+~~~text
 f3 = f1 - f2
-```
+~~~
 
 These calculations help reduce input errors and simplify form filling.
 
@@ -117,9 +139,9 @@ Form fields are defined directly in the SVG layout using **field anchors**.
 
 Example:
 
-```
+~~~text
 <rect data-eform-field="f1" x="70" y="65" width="100" height="10"/>
-```
+~~~
 
 The `data-eform-field` attribute links the visual layout to the field defined in `schema.json`.
 
@@ -144,13 +166,13 @@ This design keeps viewer implementations simple while enabling automated calcula
 
 ## Repository Structure
 
-```
+~~~text
 spec/       format specifications
 examples/   example forms
 viewer/     reference viewer prototype
 tools/      helper utilities
 docs/       documentation and guides
-```
+~~~
 
 ---
 

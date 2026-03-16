@@ -34,13 +34,15 @@ Example field definition:
 }
 ~~~
 
-Each field must correspond to a field anchor in the SVG layout.
+Each field should correspond to a field anchor in the SVG layout.
 
 Example anchor:
 
 ~~~text
-<rect data-eform-field="f1"/>
+&lt;rect data-eform-field="f1"/&gt;
 ~~~
+
+The schema defines the **logical meaning** of fields, while the layout defines their **visual placement**.
 
 ---
 
@@ -54,10 +56,13 @@ Example anchor:
 | required | indicates a mandatory field |
 | pattern | optional validation pattern |
 | codeList | reference to a standard value list |
+| format | optional semantic format hint |
 
 These properties provide **validation hints and semantic context** for form filling software.
 
 They do not replace validation performed by receiving systems.
+
+Unknown properties should be ignored by implementations to allow forward compatibility.
 
 ---
 
@@ -83,6 +88,8 @@ Examples:
 - `boolean` → checkbox  
 - `selection` → dropdown or list selection  
 
+Implementations may support additional types, but unsupported types should fall back to basic text input.
+
 ---
 
 ## 5. Validation Hints
@@ -101,7 +108,46 @@ Receiving systems remain responsible for final validation of submitted data.
 
 ---
 
-## 6. Semantic References
+## 6. Format Hints
+
+Format hints provide additional semantic information about the expected content of a field.
+
+Example:
+
+~~~json
+{
+  "email": {
+    "type": "string",
+    "format": "email"
+  }
+}
+~~~
+
+Format hints may help viewers provide improved input widgets, formatting, or validation.
+
+Examples of possible formats:
+
+~~~text
+email
+phone
+postalCode
+iban
+url
+countryCode
+dateISO
+~~~
+
+Format hints are **optional** and should be treated as guidance for user interfaces.
+
+Implementations must not rely on format hints for strict validation.
+
+Receiving systems remain responsible for final validation.
+
+Unknown format values should be ignored.
+
+---
+
+## 7. Semantic References
 
 Fields may reference external standards using registries.
 
@@ -109,7 +155,7 @@ Example:
 
 ~~~json
 {
-  "f4": {
+  "country": {
     "type": "selection",
     "codeList": "std_iso3166"
   }
@@ -128,7 +174,7 @@ The actual code list values may be provided by external systems or form filling 
 
 ---
 
-## 7. Field Identifier
+## 8. Field Identifiers
 
 The key of each field entry represents the **field identifier**.
 
@@ -144,18 +190,37 @@ Example:
 }
 ~~~
 
-This identifier is used consistently across the document:
+Field identifiers must be **unique within the document**.
+
+Identifiers may contain the following characters:
+
+- a–z
+- A–Z
+- 0–9
+- .
+- _
+
+Dot notation may be used to represent hierarchical structures.
+
+Example:
+
+~~~text
+person.name
+person.address.street
+~~~
+
+Field identifiers should remain **stable across form revisions** to ensure compatibility with previously stored data.
+
+These identifiers are used consistently across the document:
 
 - in the schema
 - in the SVG layout
 - in `data.json`
 - in optional formulas
 
-Field identifiers should remain **stable across form revisions** to ensure compatibility with previously stored data.
-
 ---
 
-## 8. Data Mapping
+## 9. Data Mapping
 
 Field values are stored in `data.json`.
 
@@ -174,9 +239,9 @@ Viewers use this mapping to populate field anchors in the layout.
 
 ---
 
-## 9. Field Anchor Mapping
+## 10. Field Anchor Mapping
 
-Each schema field must correspond to a field anchor in the SVG layout.
+Each schema field should correspond to a field anchor in the SVG layout.
 
 The mapping is defined using the attribute:
 
@@ -195,14 +260,36 @@ f1
 SVG anchor:
 
 ~~~text
-<rect data-eform-field="f1"/>
+&lt;rect data-eform-field="f1"/&gt;
 ~~~
 
 Viewers use this mapping to connect schema semantics with layout geometry.
 
 ---
 
-## 10. Computed Fields (Optional)
+## 11. Layout Metadata Interaction
+
+Layout elements may include optional metadata attributes.
+
+Example:
+
+~~~text
+&lt;rect
+  data-eform-field="person.name"
+  data-eform-type="string"
+  data-eform-required="true"
+/&gt;
+~~~
+
+These attributes allow simple viewers to interpret fields without fully processing the schema.
+
+If both layout metadata and `schema.json` define properties for a field, **the schema definition takes precedence**.
+
+Layout metadata should therefore be treated as **optional hints**.
+
+---
+
+## 12. Computed Fields (Optional)
 
 Fields may be computed using optional formulas defined in:
 
