@@ -79,5 +79,20 @@ text {
   <rect class="field" x="260" y="635" width="230" height="38"/>
   <text class="value" x="270" y="662" dominant-baseline="middle"></text>
 </g>
+  
+<!-- Signature -->
+<text x="75" y="730">Signature</text>
+<g data-eform-field="f8" data-eform-type="signature" pointer-events="bounding-box">
+  <rect
+    class="field"
+    x="260"
+    y="705"
+    width="380"
+    height="80"
+    fill="none"
+    stroke="#888"
+    stroke-dasharray="6 4"
+  />
+</g>
 
 </svg>

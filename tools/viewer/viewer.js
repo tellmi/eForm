@@ -8,10 +8,62 @@ let fields = {};
 let originalFileName = "form.eform";
 let activeEditor = null;
 
+let selectedFieldId = null;
+let signatureSVG = null;
+
 document.getElementById("fileInput").addEventListener("change", openForm);
 document.getElementById("saveBtn").addEventListener("click", saveForm);
 
-document.addEventListener("click", closeEditor);
+document.addEventListener("click", e =>
+{
+    if (activeEditor && e.target === activeEditor.input)
+    {
+        return; // don't close when clicking inside input
+    }
+
+    closeEditor();
+});
+
+document.getElementById("signatureInput")?.addEventListener("change", async e =>
+{
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".svg"))
+    {
+        alert("Please upload an SVG file.");
+        return;
+    }
+
+    signatureSVG = await file.text();
+
+    // APPLY immediately after loading
+    if (selectedFieldId)
+    {
+        applySignatureToField(selectedFieldId, signatureSVG);
+    }
+});
+
+document.getElementById("applySignatureBtn")?.addEventListener("click", () =>
+{
+    if (!selectedFieldId)
+    {
+        alert("Select a field first.");
+        return;
+    }
+
+    const field = schema.fields[selectedFieldId];
+
+    if (!field || field.type !== "signature")
+    {
+        alert("Please select the signature field.");
+        return;
+    }
+
+    // open file picker
+    document.getElementById("signatureInput").click();
+});
+
 
 /* ---------------------------
    Drag & Drop Support
@@ -204,15 +256,47 @@ function renderFields(svg)
 
         const fieldId = anchor.getAttribute("data-eform-field");
 
-        const value = data[fieldId] ?? "";
+        const value = data[fieldId];
 
-        updateAnchor(anchor, value);
+        if (typeof value === "object" && value?.type === "svg")
+        {
+            renderSignature(anchor, value.value);
+        }
+        else
+        {
+            updateAnchor(anchor, value ?? "");
+        }
 
         anchor.addEventListener("click", e =>
         {
             e.stopPropagation();
+
+            selectedFieldId = fieldId;
+
+            // ❌ block editing if computed
+            if (fieldId in formulas)
+            {
+                return;
+            }
+            // if already editing same field → just reposition cursor
+            if (activeEditor && activeEditor.fieldId === fieldId)
+            {
+                moveCursorToClick(anchor, e);
+                return;
+            }
             openEditor(anchor, fieldId);
         });
+
+        if (fieldId in formulas)
+        {
+            const rect = anchor.querySelector("rect");
+            if (rect)
+            {
+                rect.setAttribute("stroke", "#999");
+                rect.setAttribute("stroke-dasharray", "4 2");
+            }
+        }
+        
     });
 }
 
@@ -271,6 +355,13 @@ function openEditor(anchor, fieldId)
 
     const input = document.createElement("input");
 
+    const currentValue = data[fieldId];
+
+    if (typeof currentValue !== "object")
+    {
+        input.value = currentValue ?? "";
+    }
+
     input.style.position = "absolute";
     input.style.left = (screen.x + scrollX) + "px";
     input.style.top = (screen.y + scrollY) + "px";
@@ -281,13 +372,51 @@ function openEditor(anchor, fieldId)
     document.body.appendChild(input);
 
     input.focus();
+    input.select();
 
     activeEditor = { input, fieldId };
 
     input.addEventListener("keydown", e =>
     {
-        if (e.key === "Enter") commitEditor();
-        if (e.key === "Escape") closeEditor();
+        if (e.key === "Enter")
+        {
+            commitEditor();
+        }
+        else if (e.key === "Escape")
+        {
+            closeEditor();
+        }
+        else if (e.key === "Tab")
+        {
+            e.preventDefault();
+
+            const ordered = Array.from(document.querySelectorAll("[data-eform-field]"))
+              .filter(el =>
+              {
+                  const id = el.getAttribute("data-eform-field");
+                  return !(id in formulas); // skip computed
+              });
+
+            const currentId = activeEditor.fieldId;
+
+            let index = ordered.findIndex(el =>
+                el.getAttribute("data-eform-field") === currentId
+            );
+
+            index += e.shiftKey ? -1 : 1;
+
+            if (index < 0) index = ordered.length - 1;
+            if (index >= ordered.length) index = 0;
+
+            const next = ordered[index];
+            const nextId = next.getAttribute("data-eform-field");
+
+            // prevent double commit
+            input.removeEventListener("blur", commitEditor);
+
+            commitEditor();
+            openEditor(next, nextId);
+        }
     });
 
     input.addEventListener("blur", commitEditor);
@@ -308,6 +437,7 @@ function commitEditor()
     activeEditor = null;
 
     computeFormulas();
+    renderAllSignatures();
 }
 
 function closeEditor()
@@ -409,4 +539,153 @@ async function saveForm()
 
     document.body.removeChild(link);
 }
+
+function applySignatureToField(fieldId, svgText)
+{
+    data[fieldId] = {
+        type: "svg",
+        value: svgText
+    };
+
+    const anchors = fields[fieldId] || [];
+
+    anchors.forEach(anchor =>
+    {
+        renderSignature(anchor, svgText);
+    });
+}
+
+function renderSignature(anchor, svgText)
+{
+    const rect = anchor.querySelector("rect");
+    if (!rect) return;
+
+    // remove old signature
+    const existing = anchor.querySelector(".signature");
+    if (existing) existing.remove();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, "image/svg+xml");
+    const sig = doc.documentElement;
+    
+    // ensure viewBox exists
+    if (!sig.getAttribute("viewBox"))
+    {
+        const w = sig.getAttribute("width") || 200;
+        const hAttr = sig.getAttribute("height") || 50;
+
+        sig.setAttribute("viewBox", `0 0 ${parseFloat(w)} ${parseFloat(hAttr)}`);
+    }
+
+    let h = 50;
+
+    if (sig.viewBox && sig.viewBox.baseVal && sig.viewBox.baseVal.height)
+    {
+        h = sig.viewBox.baseVal.height;
+    }
+    else if (sig.getAttribute("height"))
+    {
+        h = parseFloat(sig.getAttribute("height"));
+    }
+
+    const box = rect.getBBox();
+
+    const scale = (box.height * 0.9) / h;
+
+    // center inside field
+    const offsetY = (box.height - h * scale) / 2;
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+    g.setAttribute("class", "signature");
+
+    g.setAttribute("transform",
+        `translate(${box.x}, ${box.y + offsetY}) scale(${scale})`
+    );
+
+    sig.removeAttribute("width");
+    sig.removeAttribute("height");
+
+    const imported = document.importNode(sig, true);
+
+    // move children instead of whole SVG
+    while (imported.childNodes.length > 0)
+    {
+        g.appendChild(imported.childNodes[0]);
+    }
+
+    anchor.appendChild(g);
+}
+
+function getFieldOrder()
+{
+    return Array.from(document.querySelectorAll("[data-eform-field]"));
+}
+
+function focusNextField(currentFieldId)
+{
+    const ordered = getFieldOrder();
+
+    const index = ordered.findIndex(el =>
+        el.getAttribute("data-eform-field") === currentFieldId
+    );
+
+    if (index < 0) return;
+
+    const next = ordered[index + 1];
+
+    const nextEl = next || ordered[0];
+
+    const nextId = next.getAttribute("data-eform-field");
+
+    openEditor(next, nextId);
+}
+
+function moveCursorToClick(anchor, event)
+{
+    if (!activeEditor) return;
+
+    const rect = anchor.querySelector("rect");
+    if (!rect) return;
+
+    const svg = rect.ownerSVGElement;
+    const bbox = rect.getBBox();
+
+    const pt = svg.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+
+    const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+    const relativeX = cursor.x - bbox.x;
+
+    const input = activeEditor.input;
+
+    // approximate character position
+    const textLength = input.value.length;
+    const ratio = Math.max(0, Math.min(1, relativeX / bbox.width));
+
+    const position = Math.round(textLength * ratio);
+
+    input.setSelectionRange(position, position);
+}
+
+function renderAllSignatures()
+{
+    for (const fieldId in data)
+    {
+        const value = data[fieldId];
+
+        if (typeof value === "object" && value?.type === "svg")
+        {
+            const anchors = fields[fieldId] || [];
+
+            anchors.forEach(anchor =>
+            {
+                renderSignature(anchor, value.value);
+            });
+        }
+    }
+}
+
 

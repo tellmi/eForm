@@ -44,6 +44,11 @@
       "type": "number",
       "label": "Profit",
       "semantic": "finance.profit"
+    },
+    "f8": {
+      "name": "signature",
+      "type": "signature",
+      "label": "Signature"
     }
   }
 }

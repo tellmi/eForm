@@ -102,6 +102,8 @@ The preview SVG allows the document to remain readable without specialized softw
 The ZIP container stores the structured form resources used by viewers and editors.
 
 The preview SVG may be followed by an open XML comment so that the ZIP container can be appended to the file.
+Note: Opening an .eform file directly in a browser may still show raw container data.
+Use the reference viewer for proper rendering.
 
 Example physical layout:
 
@@ -474,4 +476,45 @@ Additional implementation guidance is provided in separate documents:
 * mapping-and-semantics.md
 
 These documents are informative and not part of the core specification.
+
+## 17. Signature Fields (Experimental)
+
+eForm may be used in workflows that require user signatures.
+
+### Design Principle
+
+Signature handling is not part of the core specification and remains implementation-specific.
+
+Authentication and legal validity are typically ensured by the transmission channel or external systems.
+
+### Viewer-Level Support
+
+Viewer implementations may allow users to insert graphical signatures into form fields.
+
+Such signatures are typically:
+
+- vector-based (e.g. SVG)
+- visually placed within a field region
+- scaled to match the field geometry
+
+### Storage
+
+This specification does not define a standard way to store signatures.
+
+Possible approaches include:
+
+- embedding signature data in `data.json`
+- rendering signatures directly into the preview SVG
+- external signing mechanisms
+
+### Future Work
+
+Future versions of the specification may define:
+
+- a standardized field type for signatures
+- storage formats for signature data
+- integration with digital signature standards
+
+Implementations must remain compatible with documents that do not support signatures.
+
 

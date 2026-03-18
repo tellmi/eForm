@@ -1,6 +1,6 @@
 # eForm
 
-Version: 0.5
+Version: 0.6
 
 **eForm** is an open document format for electronic forms.
 
@@ -29,6 +29,8 @@ The format separates **visual layout**, **form structure**, and **user data**.
 An eForm document should remain readable like a paper form even without specialized software.
 
 Opening the document should still show a printable form.
+Note: Opening an .eform file directly in a browser may still show raw container data.
+Use the reference viewer for proper rendering.
 
 Because eForm layouts are SVG-based, documents can be displayed directly in modern web browsers without specialized software.
 
@@ -45,6 +47,45 @@ Version 0.5 introduces several improvements:
 - documentation for **import processing** and **mapping strategies**
 
 These additions improve integration into real-world systems while keeping the core format simple.
+
+
+## New in Version 0.6
+
+Version 0.6 introduces several improvements and experimental features:
+
+### Semantic Field Names
+
+Fields may now include a semantic `name` attribute in the schema to improve interoperability and data mapping.
+
+### Form Identification
+
+The manifest may include form identification metadata:
+
+* `formPublisher`
+* `publisherDepartment`
+* `formName`
+* `formVersion`
+
+This enables automated import and processing workflows.
+
+### Preview Generation Clarification
+
+The preview SVG should be generated automatically from layout and form data to ensure consistency.
+
+### Import Concepts (Experimental)
+
+Documentation for automated import pipelines and staged processing has been added.
+
+### Signature Support (Experimental)
+
+Viewer implementations may support inserting vector-based signatures (SVG) into form fields.
+
+This feature:
+
+* is optional
+* is not yet standardized
+* may evolve in future versions
+
 
 ---
 
