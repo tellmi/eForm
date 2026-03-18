@@ -4,39 +4,46 @@
       "name": "firstname",
       "type": "string",
       "label": "First name",
-      "maxLength": 40
+      "maxLength": 40,
+      "semantic": "person.firstName"
     },
     "f2": {
       "name": "lastname",
       "type": "string",
       "label": "Last name",
-      "maxLength": 40
+      "maxLength": 40,
+      "semantic": "person.lastName"
     },
     "f3": {
       "name": "birthdate",
       "type": "date",
-      "label": "Birth date"
+      "label": "Birth date",
+      "semantic": "person.birthDate"
     },
     "f4": {
       "name": "birthcountry",
       "type": "selection",
       "label": "Birth country",
-      "codeList": "std_iso3166"
+      "codeList": "std_iso3166",
+      "semantic": "person.birthCountry"
     },
     "f5": {
       "name": "income",
       "type": "number",
-      "label": "Income"
+      "label": "Income",
+      "semantic": "finance.income"
     },
     "f6": {
       "name": "expenses",
       "type": "number",
-      "label": "Expenses"
+      "label": "Expenses",
+      "semantic": "finance.expenses"
     },
     "f7": {
       "name": "profit",
       "type": "number",
-      "label": "Profit"
+      "label": "Profit",
+      "semantic": "finance.profit"
     }
   }
 }

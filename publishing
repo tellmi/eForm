@@ -1,0 +1,209 @@
+1️⃣ World Wide Web Consortium
+
+This is the organization behind:
+
+SVG
+
+HTML
+
+XML
+
+Web standards
+
+Since eForm relies heavily on SVG, W3C would technically be the most aligned standards body.
+
+Pros
+
+Directly related to SVG and web technologies
+
+Strong international recognition
+
+Formal standardization process
+
+Cons
+
+Hard to get something accepted without:
+
+multiple implementations
+
+industry interest
+
+Very slow process
+
+Usually proposals reach W3C after real adoption already exists.
+
+2️⃣ The Document Foundation
+
+This organization maintains:
+
+LibreOffice
+
+OpenDocument Format (ODF) ecosystem
+
+Pros
+
+Very open to document format innovation
+
+Focus on open, long-term readable formats
+
+Community-driven
+
+Easier contact path
+
+Cons
+
+Focused mostly on ODF ecosystem
+
+Not primarily a standards body
+
+Still, this might be the friendliest first place to talk.
+
+3️⃣ OASIS Open
+
+This is actually where ODF was standardized.
+
+Many document standards come from OASIS:
+
+ODF
+
+DocBook
+
+UBL
+
+Pros
+
+Very relevant to document formats
+
+Real standards body
+
+More accessible than W3C
+
+Cons
+
+Requires formal participation for full standardization
+
+4️⃣ Internet Engineering Task Force
+
+This body standardizes internet protocols and formats.
+
+Examples:
+
+HTTP
+
+MIME
+
+JSON-related RFCs
+
+If .eform becomes a MIME type, this is where it would eventually go.
+
+Example future step:
+
+application/eform+zip
+🧠 The realistic path most successful formats follow
+
+Most formats become standards in stages:
+
+Publish open specification
+
+Create reference implementation
+
+Get adoption
+
+Then approach a standards body
+
+Examples:
+
+Markdown
+
+PDF
+
+ODF
+
+WebAssembly
+
+All of them existed before standardization.
+
+🚀 What I would recommend for eForm
+
+Your immediate next steps should be:
+
+1. Publish the spec publicly
+
+GitHub repo is perfect.
+
+Include:
+
+spec/
+examples/
+reference-viewer/
+validator/
+2. Register a MIME type (later)
+
+Eventually via IETF:
+
+application/eform+zip
+3. Create a reference viewer
+
+This is the most important part.
+
+For example:
+
+eform-viewer
+eform-cli
+eform-js
+
+If people can open .eform, adoption becomes possible.
+
+4. Talk to The Document Foundation first
+
+They are likely to be supportive and curious.
+
+Possible benefits:
+
+feedback
+
+early adoption
+
+possible LibreOffice plugin
+
+📬 Where to contact The Document Foundation
+
+You could reach them through:
+
+mailing lists
+
+LibreOffice dev community
+
+TDF board contact
+
+They are quite approachable.
+
+💡 One more strategic suggestion
+
+Your format is interesting because it combines ideas from:
+
+PDF
+
+SVG
+
+ODF
+
+XForms
+
+It might help to position it as:
+
+"A lightweight open alternative to PDF forms using SVG and JSON."
+
+That framing would make people immediately understand it.
+
+✅ My honest recommendation:
+
+Release eForm 0.5 spec publicly
+
+Build reference viewer
+
+Publish example forms
+
+Then contact The Document Foundation
+
+That’s the most realistic path.

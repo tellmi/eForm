@@ -1,6 +1,6 @@
 # eForm
 
-Version: 0.4
+Version: 0.5
 
 **eForm** is an open document format for electronic forms.
 
@@ -34,11 +34,33 @@ Because eForm layouts are SVG-based, documents can be displayed directly in mode
 
 ---
 
-## Specification Version
+## What’s New in Version 0.5
 
-The current specification version is defined in this document.
+Version 0.5 introduces several improvements:
 
-All files in the `spec/` directory belong to this specification version.
+- optional **semantic field identifiers** for better interoperability
+- **form identification metadata** in the manifest
+- clarified **preview generation rules**
+- extended **security considerations**
+- documentation for **import processing** and **mapping strategies**
+
+These additions improve integration into real-world systems while keeping the core format simple.
+
+---
+
+## Specification
+
+The specification is located in the `spec/` directory:
+
+- `eform-spec.md` — core format definition
+- `formula-spec.md` — formula system
+- `layout-spec.md` — SVG layout rules
+- `schema-spec.md` — schema definition
+
+Additional documentation:
+
+- `docs/import-processing.md` — import workflows and staging
+- `docs/mapping-and-semantics.md` — semantic naming and mapping guidance
 
 ---
 
@@ -63,21 +85,21 @@ An `.eform` file consists of two parts:
 
 Conceptual structure:
 
-~~~text
+```text
 form.eform
 ├ preview.svg
 └ [ZIP container]
-   ├ mimetype
-   ├ manifest.json
-   ├ schema.json
-   ├ data.json
-   ├ layout/
-   │   └ page1.svg
-   ├ formulas/
-   │   └ formulas.json
-   └ registries/
-       └ standards.json
-~~~
+├ mimetype
+├ manifest.json
+├ schema.json
+├ data.json
+├ layout/
+│   └ page1.svg
+├ formulas/
+│   └ formulas.json
+└ registries/
+└ standards.json
+```
 
 ---
 
@@ -87,11 +109,17 @@ form.eform
 
 `preview.svg` contains a static rendering of the filled form so the document remains readable even without specialized software.
 
+The preview should be generated automatically from layout and data.
+
+---
+
 ### Layout
 
 The **SVG layout** defines the editable structure of the form.
 
 Field positions are defined using **field anchors** embedded in the layout.
+
+---
 
 ### Schema
 
@@ -101,35 +129,33 @@ It defines:
 
 - field types
 - validation hints
-- semantic references
-- optional **format hints** such as:
+- optional semantic identifiers
+- optional format hints such as:
 
-~~~text
+```text
 email
 phone
 iban
 url
-~~~
+```
+
+---
 
 ### Data
 
 The **data file** stores the current values of the form fields.
 
+---
+
 ### Formulas (Optional)
 
 The **formulas** component defines relationships between fields.
 
-Formulas may automatically compute values based on other fields.
-
 Example:
 
-~~~text
+```text
 f3 = f1 - f2
-~~~
-
-These calculations help reduce input errors and simplify form filling.
-
-Formulas are optional and do not replace server-side validation.
+```
 
 ---
 
@@ -139,11 +165,9 @@ Form fields are defined directly in the SVG layout using **field anchors**.
 
 Example:
 
-~~~text
+```text
 <rect data-eform-field="f1" x="70" y="65" width="100" height="10"/>
-~~~
-
-The `data-eform-field` attribute links the visual layout to the field defined in `schema.json`.
+```
 
 ---
 
@@ -151,28 +175,45 @@ The `data-eform-field` attribute links the visual layout to the field defined in
 
 A viewer processes an eForm roughly as follows:
 
-1. open the `.eform` file  
-2. locate the embedded ZIP container  
-3. read `manifest.json`  
-4. load the SVG layout  
-5. detect field anchors  
-6. match them with `schema.json`  
-7. display values from `data.json`  
-8. apply optional formulas to compute derived values  
+1. open the `.eform` file
+2. locate the embedded ZIP container
+3. read `manifest.json`
+4. load the SVG layout
+5. detect field anchors
+6. match them with `schema.json`
+7. display values from `data.json`
+8. apply optional formulas
 
-This design keeps viewer implementations simple while enabling automated calculations.
+This design keeps viewer implementations simple while enabling automated processing.
+
+---
+
+## Demo
+
+Two minimal tools demonstrate the eForm concept:
+
+- `tools/viewer.html`
+Interactive form viewer for rendering and editing forms
+
+- `tools/importer.html`
+Data importer showing how structured form data can be extracted
+
+These tools demonstrate both:
+
+- user interaction with forms
+- system integration and data processing
 
 ---
 
 ## Repository Structure
 
-~~~text
+```text
 spec/       format specifications
 examples/   example forms
 viewer/     reference viewer prototype
 tools/      helper utilities
 docs/       documentation and guides
-~~~
+```
 
 ---
 
@@ -180,4 +221,23 @@ docs/       documentation and guides
 
 This project is currently **experimental**.
 
-The specification and tooling are under active development.
+The specification is under active development and subject to change.
+
+The current focus is:
+
+- stabilizing the core format
+- improving interoperability
+- demonstrating real-world integration
+
+---
+
+## Vision
+
+eForm aims to provide a simple, open, and durable format for digital forms that combines:
+
+- PDF-like visual stability
+- web-style openness
+- structured machine-readable data
+
+The long-term goal is to enable reliable exchange and processing of forms across systems without proprietary dependencies.
+

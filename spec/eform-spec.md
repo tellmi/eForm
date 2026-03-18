@@ -1,6 +1,6 @@
 # eForm Specification
 
-Status: Draft  
+Status: Draft
 Project: open-eform
 
 ---
@@ -18,6 +18,17 @@ The format combines:
 An eForm behaves as the **digital equivalent of a paper form**.
 
 The document must remain readable and printable even without specialized software.
+
+---
+
+## Normative Language
+
+The key words "must", "must not", "should", and "may" are to be interpreted as follows:
+
+- "must" indicates a requirement
+- "must not" indicates a prohibition
+- "should" indicates a recommendation
+- "may" indicates an optional feature
 
 ---
 
@@ -43,7 +54,7 @@ External resources must not be required.
 
 eForm is primarily a **user interface format**.
 
-Users may enter incorrect data.  
+Users may enter incorrect data.
 Final validation is the responsibility of the receiving system.
 
 ### Graceful degradation
@@ -66,25 +77,25 @@ An `.eform` file consists of two parts:
 
 Example structure:
 
-~~~text
+```text
 form.eform
 │
 ├ preview.svg
 │
 └ [ZIP container]
-   ├ mimetype
-   ├ manifest.json
-   ├ schema.json
-   ├ data.json
-   │
-   ├ layout/
-   │   page1.svg
-   │
-   ├ formulas/
-   │   formulas.json
-   │
-   └ registries/
-~~~
+├ mimetype
+├ manifest.json
+├ schema.json
+├ data.json
+│
+├ layout/
+│   page1.svg
+│
+├ formulas/
+│   formulas.json
+│
+└ registries/
+```
 
 The preview SVG allows the document to remain readable without specialized software.
 
@@ -94,17 +105,17 @@ The preview SVG may be followed by an open XML comment so that the ZIP container
 
 Example physical layout:
 
-~~~text
-&lt;svg&gt;...&lt;/svg&gt;
-&lt;!-- eform-container --&gt;
+```text
+<svg>...</svg>
+<!-- eform-container -->
 [ZIP archive]
-~~~
+```
 
 ZIP readers locate the archive from the end of the file, so additional data before the archive does not affect extraction.
 
 ---
 
-## 4. Main Components
+## 4. Components
 
 ### Preview
 
@@ -121,9 +132,23 @@ Characteristics:
 
 The preview allows the document to remain readable even if no eForm software exists.
 
-The preview must visually correspond to the current values stored in `data.json`.
+### Preview Consistency
 
-The preview may be generated automatically from the layout and stored data.
+The preview SVG must represent the current state of the form data.
+
+The preview should be visually consistent with the values stored in `data.json`.
+
+Minor rendering differences (e.g. font substitution) are acceptable, but the semantic content must match.
+
+### Preview Generation
+
+The preview SVG should be generated automatically from the layout and the current form data.
+
+This ensures that the preview accurately represents the current state of the form.
+
+Implementations may include a pre-generated preview without recomputing it, but the preview must remain consistent with the data stored in `data.json`.
+
+If inconsistencies are detected, implementations should prefer the structured data and may regenerate the preview.
 
 ---
 
@@ -148,19 +173,17 @@ All layout SVG documents must use a consistent coordinate system.
 
 The following rules apply:
 
-- The origin `(0,0)` is located at the top-left corner of the page.
-- Coordinates increase to the right (x-axis) and downward (y-axis).
-- Units are interpreted as SVG user units.
+- The origin (0,0) is located at the top-left corner of the page
+- Coordinates increase to the right (x-axis) and downward (y-axis)
+- Units are interpreted as SVG user units
 
-Layouts must define a `viewBox` attribute on the root `&lt;svg&gt;` element.
+Layouts must define a `viewBox` attribute on the root `<svg>` element.
 
 Example:
 
-~~~text
-&lt;svg viewBox="0 0 210 297"&gt;
-~~~
-
-This example represents an A4 page in millimeter units.
+```text
+<svg viewBox="0 0 210 297">
+```
 
 Implementations should interpret one user unit as one millimeter unless otherwise specified.
 
@@ -180,51 +203,15 @@ is considered a field anchor.
 
 Example:
 
-~~~text
-&lt;rect
-  data-eform-field="person.name"
-  x="70"
-  y="65"
-  width="100"
-  height="10"
-/&gt;
-~~~
-
-The geometry of the SVG element defines the visible area of the field.
-
-Supported anchor element types include:
-
-- rect
-- circle
-- ellipse
-- path
-- text
-
-Implementations should determine the anchor bounding box using the SVG element geometry.
-
-The bounding box defines the interactive region of the field.
+```text
+<rect data-eform-field="person.name" x="70" y="65" width="100" height="10"/>
+```
 
 ---
 
 ### Embedded Layout Metadata
 
 Optional metadata attributes may be embedded in layout elements.
-
-Example:
-
-~~~text
-&lt;rect
-  data-eform-field="person.name"
-  data-eform-type="string"
-  data-eform-required="true"
-  x="70"
-  y="65"
-  width="100"
-  height="10"
-/&gt;
-~~~
-
-These attributes allow layouts to contain minimal self-describing field information.
 
 If a field is defined both in layout metadata and in `schema.json`, the schema definition takes precedence.
 
@@ -238,30 +225,50 @@ The schema defines logical field properties such as:
 - validation hints
 - semantic references
 
-The schema does **not define layout geometry**.
+The schema typically defines a set of fields identified by unique field identifiers.
 
----
+The schema does not define layout geometry.
 
-### Field Identifiers
+#### Semantic Hints (Optional)
 
-Field identifiers must be unique within the document.
-
-Identifiers may use the following characters:
-
-- `a–z`
-- `A–Z`
-- `0–9`
-- `.`
-- `_`
-
-Dot notation may be used to represent hierarchical structures.
+Fields may include an optional semantic identifier that describes the meaning of the field.
 
 Example:
 
-~~~text
-person.name
-person.address.street
-~~~
+```json
+{
+"fields": {
+"f1": {
+"type": "string",
+"semantic": "person.name"
+}
+}
+}
+```
+
+#### Characteristics
+
+- optional
+- non-binding
+- implementation-specific
+
+#### Purpose
+
+Semantic identifiers may assist:
+
+- form designers
+- import systems
+- mapping tools
+
+#### Behavior
+
+Implementations must not rely on semantic identifiers for correctness.
+
+Field identifiers remain the authoritative reference within the document.
+
+#### Privacy Consideration
+
+Semantic identifiers should avoid exposing internal data structures or database schemas.
 
 ---
 
@@ -269,63 +276,11 @@ person.address.street
 
 The data file stores the current field values.
 
-Example:
-
-~~~json
-{
-  "f1": "Anna"
-}
-~~~
-
-Each key corresponds to a field identifier defined in `schema.json`.
-
 ---
 
 ### Formulas (Optional)
 
-The formulas component defines relationships between fields.
-
-Formulas allow automatic computation of derived values based on other field values.
-
-Example:
-
-~~~text
-f7 = f5 - f6
-~~~
-
-Formulas assist form filling software and reduce the risk of incorrect user input.
-
-Formulas are optional and do not replace validation performed by receiving systems.
-
----
-
-### Stored Values and Recalculation
-
-Computed field values may be stored in `data.json`.
-
-These stored values represent the value of the field at the time the form was last saved.
-
-Example:
-
-~~~json
-{
-  "f5": 5000,
-  "f6": 3200,
-  "f7": 1800
-}
-~~~
-
-Software processing an eForm should recompute formula results when formulas are present.
-
-If a stored value differs from the recomputed result, the recomputed value should be considered authoritative.
-
-Importers may ignore stored values for computed fields and rely on recomputed results.
-
-This behavior allows:
-
-- consistent validation
-- detection of modified or inconsistent data
-- compatibility with systems that do not evaluate formulas
+Formulas define relationships between fields and may compute derived values.
 
 ---
 
@@ -333,47 +288,17 @@ This behavior allows:
 
 Formulas must be deterministic and side-effect free.
 
-Formula evaluation must depend only on the values of referenced fields.
-
-Implementations must not rely on:
-
-- external data sources
-- random number generation
-- system time
-- environment-dependent values
-
-This requirement ensures that all implementations compute identical results.
-
-The syntax and evaluation rules of formulas are defined in the Formula Specification document.
-
 ---
 
 ### Registries (Optional)
 
-Registries provide reusable references such as:
-
-- standards
-- code lists
-
-These registries may reference external standards.
+Registries provide reusable references such as standards or code lists.
 
 ---
 
 ## 5. Multi-Page Documents
 
 Forms may contain multiple pages.
-
-The editable layout may therefore contain multiple SVG files:
-
-~~~text
-layout/page1.svg
-layout/page2.svg
-layout/page3.svg
-~~~
-
-The preview SVG contains all pages rendered sequentially.
-
-Pages are typically stacked vertically within the preview document.
 
 ---
 
@@ -383,98 +308,62 @@ The file `manifest.json` describes the structure of the eForm container.
 
 Example:
 
-~~~json
+```json
 {
-  "specVersion": "0.4",
-  "layout": [
-    "layout/page1.svg"
-  ],
-  "schema": "schema.json",
-  "data": "data.json",
-  "formulas": "formulas/formulas.json"
+"specVersion": "0.4",
+"layout": ["layout/page1.svg"],
+"schema": "schema.json",
+"data": "data.json",
+"formulas": "formulas/formulas.json"
 }
-~~~
+```
 
-Purpose:
+---
 
-- identify core resources
-- declare document version
-- enable future extensibility
+## 6.1 Form Identification
 
-The manifest must be located in the root of the ZIP container.
+To support automated processing and interoperability, the manifest may include form identification metadata.
 
-Unknown manifest fields must be ignored by implementations.
+### Fields
+
+- formPublisher
+- publisherDepartment
+- formName
+- formVersion
+
+The combination should uniquely identify a form definition.
 
 ---
 
 ## 7. Encoding
 
-All textual resources in an eForm document must be encoded using UTF-8.
-
-This requirement applies to:
-
-- JSON files
-- SVG files
-- manifest.json
-- schema.json
-- data.json
-
-Byte Order Marks (BOM) should not be used.
-
-Implementations must assume UTF-8 encoding when reading these files.
+All textual resources must use UTF-8 encoding.
 
 ---
 
 ## 8. Compatibility
 
-eForm is designed so that:
-
-- browsers can display the preview SVG directly
-- operating systems can display the document without specialized software
-- specialized software can provide interactive editing
-
-A viewer reads the ZIP container to access schema, data, layout resources, and optional formulas.
-
-Because layouts use SVG and field anchors rely on standard `data-*` attributes, layouts may also be made interactive using standard web technologies.
-
-Simple browser scripts can convert field anchors into input fields without requiring specialized software.
+eForm is designed for direct browser rendering and system processing.
 
 ---
 
 ## 9. MIME Type
 
-The MIME type for eForm documents is:
-
-~~~text
+```text
 application/eform+zip
-~~~
-
-The ZIP container must include a file named `mimetype` as the first entry in the archive.
-
-The file must contain exactly the MIME type string and must not be compressed.
+```
 
 ---
 
 ## 10. ZIP Container Requirements
 
-The ZIP container must use the standard ZIP file format.
-
-ZIP64 is permitted.
-
-Files inside the archive should use forward-slash (`/`) path separators.
+Standard ZIP format must be used.
 
 ---
 
 ## 11. Versioning
 
-The specification uses semantic versioning.
-
-~~~text
-0.x experimental
-1.x stable
-~~~
-
-The manifest may include the specification version.
+Semantic versioning applies.
 
 ---
 
@@ -484,13 +373,105 @@ The manifest may include the specification version.
 |------|--------|
 | eForm | document container |
 | Viewer | software rendering and editing the form |
-| Schema | logical field definition |
-| Layout | editable form template |
-| Preview | static rendered form document |
-| Field Anchor | SVG element defining field geometry |
 
 ---
 
 ## 13. Project Status
 
 This specification is experimental and subject to change.
+
+---
+
+## 14. Security Considerations
+
+eForm documents may originate from untrusted sources and must be handled securely.
+
+### General Principles
+
+Implementations must treat all input data as untrusted.
+
+### SVG Restrictions
+
+SVG documents (layout and preview) must not contain:
+
+- script elements
+- external resource references
+- embedded executable content
+
+### JSON Handling
+
+JSON content must be treated strictly as data.
+
+Implementations must not evaluate JSON values as executable code.
+
+### XML Handling
+
+If XML-based data is used:
+
+- external entities must be disabled
+- DTD processing should be disabled
+
+### Formula Safety
+
+Formulas must be:
+
+- deterministic
+- side-effect free
+
+Implementations must not allow:
+
+- execution of arbitrary code
+- access to external resources
+
+### Error Handling
+
+Invalid or unsafe documents must not cause system failures.
+
+Implementations should:
+
+- reject unsafe content
+- log validation errors
+
+---
+
+## 15. Signatures and Authenticity
+
+eForm does not require built-in signature mechanisms.
+
+In many use cases, document authenticity and integrity are ensured by the transmission channel, such as:
+
+- secure upload portals
+- authenticated communication systems
+- trusted document exchange platforms
+
+### Optional Document Signing
+
+If electronic signatures are applied at the document level, implementations may sign selected resources within the container.
+
+Typical candidates include:
+
+- `data.json`
+- layout SVG files
+- `preview.svg`
+
+The exact signature mechanism is not defined by this specification.
+
+Future versions may define standardized approaches for embedded signatures.
+
+### Design Principle
+
+Signature handling should not interfere with:
+
+- readability of the preview
+- accessibility of structured data
+- long-term preservation of documents
+
+## 16. Informative Documents
+
+Additional implementation guidance is provided in separate documents:
+
+* import-processing.md
+* mapping-and-semantics.md
+
+These documents are informative and not part of the core specification.
+

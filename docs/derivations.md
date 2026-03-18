@@ -35,49 +35,55 @@ Derived formats may define additional rules while remaining compatible with the 
 
 ---
 
-## 3. eBill Format
+## eBill Profile
 
-The `.ebill` format is a specialized profile of eForm used for structured invoices.
+The **eBill** format is a specialized eForm profile for electronic invoices.
 
-An eBill document remains an eForm container but defines additional constraints.
+Unlike generic eForm documents, eBill integrates existing invoice standards such as:
 
-Typical requirements may include:
+- ZUGFeRD
+- XRechnung
 
-- mandatory fields (invoice number, amount, currency)
-- standardized semantics
-- reference code lists
-- validation rules
-- optional computed totals
+### Data Representation
+
+In eBill documents, the standard `data.json` file may be replaced or complemented by a structured invoice document:
+
+```text
+data.xml (e.g. ZUGFeRD / XRechnung)
+```
 
 Example structure:
 
-~~~text
+```text
 invoice.ebill
 ├ preview.svg
 └ [ZIP container]
-   ├ mimetype
-   ├ manifest.json
-   ├ schema.json
-   ├ data.json
-   ├ layout/
-   │   └ invoice.svg
-   ├ formulas/
-   │   └ formulas.json
-   └ registries/
-~~~
+├ mimetype
+├ manifest.json
+├ schema.json
+├ data.xml
+├ layout/
+│ └ invoice.svg
+└ registries/
+```
 
-The manifest may include a profile identifier.
+### Behavior
 
-Example:
+- The XML document is the **authoritative business data**
+- The SVG layout provides a **human-readable representation**
+- The schema may provide **mapping hints** between layout fields and XML elements
 
-~~~json
-{
-  "type": "open-eform",
-  "profile": "ebill"
-}
-~~~
+### Compatibility Rules
 
-Specialized software may validate that required fields are present and conform to the invoice profile.
+- If `data.xml` is present, it should be treated as authoritative
+- `data.json` may be omitted
+- If both are present, importers must prefer `data.xml`
+
+### Benefits
+
+- compatibility with existing standards
+- human-readable invoice rendering
+- simplified integration into existing accounting systems
 
 ---
 

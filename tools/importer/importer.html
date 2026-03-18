@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>eForm Importer</title>
+
+  
+  <link rel="icon" type="image/svg+xml" href="../../icon/eForm_min.svg">
+
+  <!-- JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #dropzone {
+      border: 2px dashed #888;
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    #dropzone.dragover {
+      background: #f0f8ff;
+      border-color: #007acc;
+      color: #000;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #f5f5f5;
+    }
+
+    /* ✨ Semantic highlight */
+    td:nth-child(3) {
+      color: #007acc;
+      font-size: 0.9em;
+    }
+
+    #fileInput {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>eForm Importer</h1>
+
+<div id="dropzone">
+  Drag & Drop your <strong>.eform</strong> file here<br/>
+  or<br/>
+  <input type="file" id="fileInput" accept=".eform" />
+</div>
+
+<table id="resultTable">
+  <thead>
+    <tr>
+      <th>Field ID</th>
+      <th>Value</th>
+      <th>Semantic</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script src="importer.js"></script>
+
+</body>
+</html>
