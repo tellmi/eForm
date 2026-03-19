@@ -53,13 +53,23 @@ find . -type f ! -name "mimetype" | sort | zip -X -q "../$TMP_ZIP" -@
 
 cd ..
 
-echo "Combining preview.svg + ZIP..."
+echo "Encoding ZIP to Base64..."
+
+BASE64_ZIP=$(base64 -w 0 "$TMP_ZIP")
+
+echo "Combining preview.svg + embedded container..."
 
 (
+  # ensure UTF-8 header exists
+  if ! head -n 1 preview.svg | grep -q "<?xml"; then
+    echo '<?xml version="1.0" encoding="UTF-8"?>'
+  fi
+
   cat preview.svg
   echo
-  echo "<!-- eform-container -->"
-  cat "$TMP_ZIP"
+  echo "<!-- eform-container"
+  echo "$BASE64_ZIP"
+  echo "-->"
 ) > "$OUTPUT"
 
 rm "$TMP_ZIP"

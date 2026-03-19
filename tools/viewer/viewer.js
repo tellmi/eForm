@@ -104,36 +104,18 @@ async function loadEForm(file)
 {
     originalFileName = file.name;
 
-    const buffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
+    const text = await file.text();
 
-    /* find ZIP header */
+    let zipBuffer = extractZipFromText(text);
 
-    let zipStart = -1;
-
-    for (let i = 0; i < bytes.length - 3; i++)
+    if (!zipBuffer)
     {
-        if (
-            bytes[i] === 0x50 &&
-            bytes[i+1] === 0x4B &&
-            bytes[i+2] === 0x03 &&
-            bytes[i+3] === 0x04
-        )
-        {
-            zipStart = i;
-            break;
-        }
+        // fallback to old binary format
+        const buffer = await file.arrayBuffer();
+        zipBuffer = buffer;
     }
 
-    if (zipStart < 0)
-    {
-        alert("ZIP container not found in eForm file.");
-        return;
-    }
-
-    const zipData = buffer.slice(zipStart);
-
-    zip = await JSZip.loadAsync(zipData);
+    zip = await JSZip.loadAsync(zipBuffer);
 
     if (!zip.file("manifest.json"))
     {
@@ -523,20 +505,72 @@ async function saveForm()
 {
     if (!zip || !manifest) return;
 
+    // update data.json inside zip
     const json = JSON.stringify(data, null, 2);
-
     zip.file(manifest.data || "data.json", json);
 
-    const blob = await zip.generateAsync({ type: "blob" });
+    // generate zip as binary
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+
+    // convert to base64
+    const arrayBuffer = await zipBlob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++)
+    {
+        binary += String.fromCharCode(bytes[i]);
+    }
+
+    const base64 = btoa(binary);
+
+    // IMPORTANT: load preview SVG (first layout page or preview.svg)
+    let previewSVG = "";
+
+    if (manifest.layout && manifest.layout.length > 0)
+    {
+        previewSVG = await generatePreviewSVG();
+    }
+    else
+    {
+        previewSVG = `<svg xmlns="http://www.w3.org/2000/svg"></svg>`;
+    }
+    
+    if (!previewSVG || !previewSVG.includes("<svg"))
+    {
+        previewSVG = `<svg xmlns="http://www.w3.org/2000/svg"></svg>`;
+    }
+
+    // ensure UTF-8 header
+    if (!previewSVG.startsWith("<?xml"))
+    {
+        previewSVG =
+            `<?xml version="1.0" encoding="UTF-8"?>\n` + previewSVG;
+    }
+
+    // append base64 container
+    const insertIndex = previewSVG.lastIndexOf("</svg>");
+
+    const finalContent =
+        previewSVG.slice(0, insertIndex) +
+        `\n<!-- eform-container\n${base64}\n-->\n` +
+    previewSVG.slice(insertIndex);
+
+    // save as file
+    console.log(finalContent.slice(0, 200));
+    const blob = new Blob([finalContent], { type: "application/octet-stream" });
 
     const link = document.createElement("a");
-
     link.href = URL.createObjectURL(blob);
+    if (!originalFileName.endsWith(".eform"))
+    {
+        originalFileName = originalFileName.replace(/\.\w+$/, "") + ".eform";
+    }
+
     link.download = originalFileName;
 
     document.body.appendChild(link);
     link.click();
-
     document.body.removeChild(link);
 }
 
@@ -686,6 +720,145 @@ function renderAllSignatures()
             });
         }
     }
+}
+
+function extractZipFromText(text)
+{
+    const marker = "<!-- eform-container";
+
+    const start = text.indexOf(marker);
+    if (start < 0) return null;
+
+    const end = text.indexOf("-->", start);
+    if (end < 0) return null;
+
+    const base64 = text
+        .slice(start + marker.length, end)
+        .trim();
+
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++)
+    {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes.buffer;
+}
+
+async function generatePreviewSVG()
+{
+    let svgText = "";
+
+    if (zip.file("preview.svg"))
+    {
+        svgText = await zip.file("preview.svg").async("string");
+    }
+    else if (manifest.layout?.length > 0)
+    {
+        svgText = await zip.file(manifest.layout[0]).async("string");
+    }
+    else
+    {
+        return `<svg xmlns="http://www.w3.org/2000/svg"></svg>`;
+    }
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, "image/svg+xml");
+
+    const svg = doc.documentElement;
+
+    const anchors = svg.querySelectorAll("[data-eform-field]");
+
+    anchors.forEach(anchor =>
+    {
+        const fieldId = anchor.getAttribute("data-eform-field");
+        const value = data[fieldId];
+
+        // TEXT
+        if (typeof value !== "object")
+        {
+            const text = anchor.querySelector("text");
+            if (text)
+            {
+                text.textContent = value ?? "";
+            }
+        }
+
+        // SIGNATURE
+        if (typeof value === "object" && value?.type === "svg")
+        {
+            const rect = anchor.querySelector("rect");
+            if (!rect) return;
+
+            // 🔥 remove existing content (important!)
+            const text = anchor.querySelector("text");
+            if (text) text.textContent = "";
+
+            const parser = new DOMParser();
+            const sigDoc = parser.parseFromString(value.value, "image/svg+xml");
+            const sig = sigDoc.documentElement;
+
+            // ensure viewBox exists
+            if (!sig.getAttribute("viewBox"))
+            {
+                const w = sig.getAttribute("width") || 200;
+                const h = sig.getAttribute("height") || 50;
+                sig.setAttribute("viewBox", `0 0 ${w} ${h}`);
+            }
+
+            // 🔥 safe height extraction
+            let h = 50;
+            const vbAttr = sig.getAttribute("viewBox");
+
+            if (vbAttr)
+            {
+                const parts = vbAttr.trim().split(/\s+/).map(Number);
+                if (parts.length === 4 && parts[3] > 0)
+                {
+                    h = parts[3];
+                }
+            }
+            else if (sig.getAttribute("height"))
+            {
+                h = parseFloat(sig.getAttribute("height")) || 50;
+            }
+
+            const box = {
+                x: parseFloat(rect.getAttribute("x")) || 0,
+                y: parseFloat(rect.getAttribute("y")) || 0,
+                width: parseFloat(rect.getAttribute("width")) || 100,
+                height: parseFloat(rect.getAttribute("height")) || 40
+            };
+
+            // 🔥 prevent invalid scale
+            const scale = h > 0 ? (box.height * 0.9) / h : 1;
+
+            const offsetY = (box.height - h * scale) / 2;
+
+            const g = doc.createElementNS("http://www.w3.org/2000/svg", "g");
+
+            g.setAttribute("transform",
+                `translate(${box.x}, ${box.y + offsetY}) scale(${scale})`
+            );
+
+            sig.removeAttribute("width");
+            sig.removeAttribute("height");
+
+            const imported = doc.importNode(sig, true);
+
+            while (imported.childNodes.length > 0)
+            {
+                g.appendChild(imported.childNodes[0]);
+            }
+
+            anchor.appendChild(g);
+        }
+    });
+
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(doc);
 }
 
 

@@ -4,152 +4,257 @@
 
 ## 1. Overview
 
-The eForm format is designed as a minimal document format.
+The eForm format is designed as a minimal and extensible document format.
 
-Specialized use cases may define derivative formats built on top of the eForm container.
+Specialized use cases may define **derived formats (profiles)** built on top of the eForm container.
 
-These derivatives extend eForm without modifying the core specification.
+Derived formats extend eForm without modifying the core specification.
 
 Examples include:
 
-- electronic invoices
-- case files
+- electronic invoices (eBill)
+- case files (eCase)
 - document bundles
 
-Derived formats inherit the base eForm architecture and may define additional constraints or conventions.
+All derived formats must remain compatible with the base eForm structure.
 
 ---
 
-## 2. Design Philosophy
+## 2. Design Principles
 
-The base eForm format focuses on four core concepts:
+The base eForm format focuses on:
 
-visual layout  
-structured form data  
-machine-readable schema  
-optional computation rules  
+- visual layout (SVG)
+- structured data
+- machine-readable schema
+- optional computation rules
 
-Complex workflows, attachments, or domain-specific rules are intentionally excluded from the core format.
+Domain-specific logic such as:
 
-Derived formats may define additional rules while remaining compatible with the eForm container structure.
+- business rules
+- attachments
+- workflows
+
+is intentionally excluded from the core format.
+
+Derived formats may define such rules while preserving compatibility.
 
 ---
 
-## eBill Profile
+## 3. Profiles
 
-The **eBill** format is a specialized eForm profile for electronic invoices.
+Derived formats are referred to as **profiles**.
 
-Unlike generic eForm documents, eBill integrates existing invoice standards such as:
+A profile must:
+
+- declare itself in `manifest.json`
+- remain a valid eForm container
+- not break core compatibility
+
+Example:
+
+    {
+      "profile": "eBill"
+    }
+
+Unknown profiles must not prevent a document from being rendered as a standard eForm.
+
+---
+
+## 4. eBill Profile
+
+The **eBill** profile defines a standardized usage of eForm for electronic invoices.
+
+It integrates established invoice standards such as:
 
 - ZUGFeRD
 - XRechnung
 
-### Data Representation
+---
 
-In eBill documents, the standard `data.json` file may be replaced or complemented by a structured invoice document:
+### 4.1 Core Principle
 
-```text
-data.xml (e.g. ZUGFeRD / XRechnung)
-```
+In eBill documents:
 
-Example structure:
-
-```text
-invoice.ebill
-├ preview.svg
-└ [ZIP container]
-├ mimetype
-├ manifest.json
-├ schema.json
-├ data.xml
-├ layout/
-│ └ invoice.svg
-└ registries/
-```
-
-### Behavior
-
-- The XML document is the **authoritative business data**
-- The SVG layout provides a **human-readable representation**
-- The schema may provide **mapping hints** between layout fields and XML elements
-
-### Compatibility Rules
-
-- If `data.xml` is present, it should be treated as authoritative
-- `data.json` may be omitted
-- If both are present, importers must prefer `data.xml`
-
-### Benefits
-
-- compatibility with existing standards
-- human-readable invoice rendering
-- simplified integration into existing accounting systems
+- the XML invoice is the **authoritative business data**
+- the SVG layout is a **human-readable representation**
+- the eForm container provides transport and rendering
 
 ---
 
-## 4. eCase Format
+### 4.2 Data Model
 
-The `.ecase` format represents a case or dossier containing multiple documents.
+The standard `data.json` file is replaced by:
 
-Unlike eForm, eCase acts as a **container for multiple resources**.
+    data.xml
 
-An eCase may include:
+The XML must conform to a recognized invoice standard.
 
-- multiple eForms
-- supporting documents
-- case metadata
+---
 
-Example structure:
+### 4.3 File Structure
 
-~~~text
-case.ecase
-├ manifest.json
-├ forms/
-│   ├ application.eform
-│   └ tax.eform
-└ documents/
-    ├ passport.pdf
-    └ contract.pdf
-~~~
+    invoice.ebill
+    │
+    ├ preview.svg
+    │
+    └ [embedded container]
+       ├ mimetype
+       ├ manifest.json
+       ├ schema.json
+       ├ data.xml
+       │
+       ├ layout/
+       │   invoice.svg
+       │
+       └ registries/
 
-The eCase container typically uses ZIP packaging.
+---
 
-The manifest describes the contents of the case.
+### 4.4 Manifest Requirements
+
+The manifest must include:
+
+    {
+      "profile": "eBill"
+    }
+
+The manifest must reference `data.xml`.
+
+---
+
+### 4.5 Behavior
+
+- `data.xml` is the single source of truth
+- viewers must not treat layout values as authoritative
+- the preview must reflect the XML content
+
+---
+
+### 4.6 Mapping
+
+The schema may define mappings between layout fields and XML elements.
 
 Example:
 
-~~~json
-{
-  "type": "open-ecase",
-  "version": "1.0",
-  "forms": [
-    "forms/application.eform"
-  ],
-  "documents": [
-    "documents/passport.pdf"
-  ]
-}
-~~~
+    {
+      "fields": {
+        "invoice.total": {
+          "type": "number",
+          "source": "/Invoice/LegalMonetaryTotal/PayableAmount"
+        }
+      }
+    }
+
+Mappings are optional.
 
 ---
 
-## 5. Compatibility
+### 4.7 Compatibility Rules
+
+- eBill must remain a valid eForm container
+- generic viewers must render the preview
+- generic viewers may ignore `data.xml`
+
+If both `data.json` and `data.xml` exist:
+
+- `data.xml` must take precedence
+- `data.json` must be ignored for business logic
+
+---
+
+### 4.8 Constraints
+
+- `data.xml` must be UTF-8 encoded
+- XML must be self-contained
+- XML must not reference external resources
+
+---
+
+## 5. eCase Profile
+
+The **eCase** profile defines a container for grouping documents.
+
+An eCase consists of:
+
+- one or more eForms
+- additional attachments
+
+---
+
+### 5.1 Structure
+
+    case.ecase
+    │
+    ├ manifest.json
+    ├ forms/
+    │   ├ form1.eform
+    │   └ form2.eform
+    │
+    └ attachments/
+        ├ document.pdf
+        └ image.png
+
+---
+
+### 5.2 Manifest Example
+
+    {
+      "type": "open-ecase",
+      "version": "1.0",
+      "forms": [
+        "forms/form1.eform"
+      ],
+      "attachments": [
+        "attachments/document.pdf"
+      ]
+    }
+
+---
+
+### 5.3 Behavior
+
+- eCase acts as a container only
+- contained eForms remain independent and valid
+- attachments are not interpreted by the eForm specification
+
+---
+
+## 6. Compatibility
 
 Derived formats must remain compatible with the base eForm specification.
 
-Software that understands only eForm should still be able to extract and render individual forms contained in derived formats.
+Software that supports only eForm should still be able to:
 
-Derived formats should therefore avoid modifying the fundamental structure of eForm documents.
+- extract embedded forms
+- render previews
+- access structured data where applicable
+
+Derived formats must not modify the fundamental structure of eForm documents.
 
 ---
 
-## 6. Future Extensions
+## 7. Naming and Compliance
 
-Possible future derivatives include:
+The identifiers:
+
+- eForm
+- eBill
+- eCase
+
+are part of the specification.
+
+Implementations must not use these names for incompatible formats.
+
+---
+
+## 8. Future Extensions
+
+Possible future profiles include:
 
 - application packages
 - legal filing bundles
 - invoice archives
 - document exchange containers
 
-The eForm specification intentionally keeps the base format minimal to allow such extensions.
+The eForm format is intentionally minimal to support such extensions.

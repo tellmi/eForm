@@ -54,7 +54,7 @@ External resources must not be required.
 
 eForm is primarily a **user interface format**.
 
-Users may enter incorrect data.
+Users may enter incorrect data.  
 Final validation is the responsibility of the receiving system.
 
 ### Graceful degradation
@@ -77,43 +77,42 @@ An `.eform` file consists of two parts:
 
 Example structure:
 
-```text
-form.eform
-│
-├ preview.svg
-│
-└ [ZIP container]
-├ mimetype
-├ manifest.json
-├ schema.json
-├ data.json
-│
-├ layout/
-│   page1.svg
-│
-├ formulas/
-│   formulas.json
-│
-└ registries/
-```
+    form.eform
+    │
+    ├ preview.svg
+    │
+    └ [ZIP container]
+       ├ mimetype
+       ├ manifest.json
+       ├ schema.json
+       ├ data.json
+       │
+       ├ layout/
+       │   page1.svg
+       │
+       ├ formulas/
+       │   formulas.json
+       │
+       └ registries/
 
 The preview SVG allows the document to remain readable without specialized software.
 
 The ZIP container stores the structured form resources used by viewers and editors.
 
-The preview SVG may be followed by an open XML comment so that the ZIP container can be appended to the file.
-Note: Opening an .eform file directly in a browser may still show raw container data.
+The preview SVG may be followed by an open XML comment so that the container can be appended to the file.  
+Note: Opening an .eform file directly in a browser may still show raw container data.  
 Use the reference viewer for proper rendering.
 
 Example physical layout:
 
-```text
-<svg>...</svg>
-<!-- eform-container -->
-[ZIP archive]
-```
+    <svg>...</svg>
+    <!-- eform-container
+    BASE64_ENCODED_ZIP_DATA
+    -->
 
-ZIP readers locate the archive from the end of the file, so additional data before the archive does not affect extraction.
+The container is base64-encoded and embedded inside an XML comment.
+
+Implementations must extract and decode this section to access the ZIP container.
 
 ---
 
@@ -183,9 +182,7 @@ Layouts must define a `viewBox` attribute on the root `<svg>` element.
 
 Example:
 
-```text
-<svg viewBox="0 0 210 297">
-```
+    <svg viewBox="0 0 210 297">
 
 Implementations should interpret one user unit as one millimeter unless otherwise specified.
 
@@ -199,15 +196,13 @@ A field anchor defines the geometry of a form field within the layout.
 
 Any SVG element containing the attribute
 
-`data-eform-field`
+    data-eform-field
 
 is considered a field anchor.
 
 Example:
 
-```text
-<rect data-eform-field="person.name" x="70" y="65" width="100" height="10"/>
-```
+    <rect data-eform-field="person.name" x="70" y="65" width="100" height="10"/>
 
 ---
 
@@ -237,40 +232,14 @@ Fields may include an optional semantic identifier that describes the meaning of
 
 Example:
 
-```json
-{
-"fields": {
-"f1": {
-"type": "string",
-"semantic": "person.name"
-}
-}
-}
-```
-
-#### Characteristics
-
-- optional
-- non-binding
-- implementation-specific
-
-#### Purpose
-
-Semantic identifiers may assist:
-
-- form designers
-- import systems
-- mapping tools
-
-#### Behavior
-
-Implementations must not rely on semantic identifiers for correctness.
-
-Field identifiers remain the authoritative reference within the document.
-
-#### Privacy Consideration
-
-Semantic identifiers should avoid exposing internal data structures or database schemas.
+    {
+      "fields": {
+        "f1": {
+          "type": "string",
+          "semantic": "person.name"
+        }
+      }
+    }
 
 ---
 
@@ -310,15 +279,13 @@ The file `manifest.json` describes the structure of the eForm container.
 
 Example:
 
-```json
-{
-"specVersion": "0.4",
-"layout": ["layout/page1.svg"],
-"schema": "schema.json",
-"data": "data.json",
-"formulas": "formulas/formulas.json"
-}
-```
+    {
+      "specVersion": "0.65",
+      "layout": ["layout/page1.svg"],
+      "schema": "schema.json",
+      "data": "data.json",
+      "formulas": "formulas/formulas.json"
+    }
 
 ---
 
@@ -332,8 +299,6 @@ To support automated processing and interoperability, the manifest may include f
 - publisherDepartment
 - formName
 - formVersion
-
-The combination should uniquely identify a form definition.
 
 ---
 
@@ -349,11 +314,35 @@ eForm is designed for direct browser rendering and system processing.
 
 ---
 
+## 8.1 Profiles
+
+eForm supports derived formats called **profiles**.
+
+Profiles extend the base format for specific domains while remaining fully compatible with the core specification.
+
+### Examples
+
+- eCase
+- eBill
+
+### Declaration
+
+A profile may be declared in `manifest.json`:
+
+    {
+      "profile": "eBill"
+    }
+
+### Rules
+
+- Profiles must remain valid eForm containers
+- Core structure must not be broken
+
+---
+
 ## 9. MIME Type
 
-```text
-application/eform+zip
-```
+    application/eform+zip
 
 ---
 
@@ -378,6 +367,20 @@ Semantic versioning applies.
 
 ---
 
+## 12.1 Naming and Compliance
+
+The identifiers:
+
+- eForm
+- eCase
+- eBill
+
+are part of the official specification.
+
+Use of these names requires compliance with the corresponding specification and profile definitions.
+
+---
+
 ## 13. Project Status
 
 This specification is experimental and subject to change.
@@ -386,135 +389,45 @@ This specification is experimental and subject to change.
 
 ## 14. Security Considerations
 
-eForm documents may originate from untrusted sources and must be handled securely.
+Implementations must treat all input as untrusted.
 
-### General Principles
+SVG must not contain scripts or external references.
 
-Implementations must treat all input data as untrusted.
-
-### SVG Restrictions
-
-SVG documents (layout and preview) must not contain:
-
-- script elements
-- external resource references
-- embedded executable content
-
-### JSON Handling
-
-JSON content must be treated strictly as data.
-
-Implementations must not evaluate JSON values as executable code.
-
-### XML Handling
-
-If XML-based data is used:
-
-- external entities must be disabled
-- DTD processing should be disabled
-
-### Formula Safety
-
-Formulas must be:
-
-- deterministic
-- side-effect free
-
-Implementations must not allow:
-
-- execution of arbitrary code
-- access to external resources
-
-### Error Handling
-
-Invalid or unsafe documents must not cause system failures.
-
-Implementations should:
-
-- reject unsafe content
-- log validation errors
+JSON must not be executed.
 
 ---
 
-## 15. Signatures and Authenticity
-
-eForm does not require built-in signature mechanisms.
-
-In many use cases, document authenticity and integrity are ensured by the transmission channel, such as:
-
-- secure upload portals
-- authenticated communication systems
-- trusted document exchange platforms
-
-### Optional Document Signing
-
-If electronic signatures are applied at the document level, implementations may sign selected resources within the container.
-
-Typical candidates include:
-
-- `data.json`
-- layout SVG files
-- `preview.svg`
-
-The exact signature mechanism is not defined by this specification.
-
-Future versions may define standardized approaches for embedded signatures.
-
-### Design Principle
-
-Signature handling should not interfere with:
-
-- readability of the preview
-- accessibility of structured data
-- long-term preservation of documents
-
-## 16. Informative Documents
-
-Additional implementation guidance is provided in separate documents:
-
-* import-processing.md
-* mapping-and-semantics.md
-
-These documents are informative and not part of the core specification.
-
 ## 17. Signature Fields (Experimental)
 
-eForm may be used in workflows that require user signatures.
+Signatures are typically stored in `data.json`:
 
-### Design Principle
+    {
+      "type": "svg",
+      "value": "<svg>...</svg>"
+    }
 
-Signature handling is not part of the core specification and remains implementation-specific.
+Viewer implementations should render signatures and include them in previews.
 
-Authentication and legal validity are typically ensured by the transmission channel or external systems.
+## 18. Visual Identity (Non-Normative)
 
-### Viewer-Level Support
+Derived formats may define visual identifiers such as icons to improve recognition and usability.
 
-Viewer implementations may allow users to insert graphical signatures into form fields.
+### Design Principles
 
-Such signatures are typically:
+Visual identifiers should:
 
-- vector-based (e.g. SVG)
-- visually placed within a field region
-- scaled to match the field geometry
+- reflect the semantic purpose of the format
+- remain simple and recognizable at small sizes
+- be visually consistent across the eForm ecosystem
 
-### Storage
+### Examples
 
-This specification does not define a standard way to store signatures.
+- eCase may use a container or suitcase symbol to represent grouped documents
+- eBill may use a currency symbol combined with document elements to represent invoices
 
-Possible approaches include:
+### Scope
 
-- embedding signature data in `data.json`
-- rendering signatures directly into the preview SVG
-- external signing mechanisms
+Visual identity is not part of the core specification and remains optional.
 
-### Future Work
-
-Future versions of the specification may define:
-
-- a standardized field type for signatures
-- storage formats for signature data
-- integration with digital signature standards
-
-Implementations must remain compatible with documents that do not support signatures.
-
+Implementations may define their own visual representations as long as they do not imply incompatible behavior.
 
