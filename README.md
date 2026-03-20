@@ -1,6 +1,6 @@
 # eForm
 
-Version: 0.65
+Version: 0.6.6
 
 **eForm** is an open document format for electronic forms.
 
@@ -89,6 +89,9 @@ are part of the official specification.
 Use of these names requires compliance with the respective specification and profiles.
 
 This ensures consistency and prevents incompatible forks of the format.
+
+### changes in 0.6.6
+fixed importer.js to load the new eform spec.
 
 ---
 

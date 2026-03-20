@@ -34,14 +34,19 @@ fileInput.addEventListener("change", (e) => {
 // --- Core Logic ---
 
 async function handleFile(file) {
-  // Clear table immediately (no placeholder flicker)
   tableBody.innerHTML = "";
 
   try {
-    const arrayBuffer = await file.arrayBuffer();
+    const text = await file.text();
 
-    // JSZip finds ZIP even if appended after SVG
-    const zip = await JSZip.loadAsync(arrayBuffer);
+    let zipBuffer = extractZipFromText(text);
+
+    if (!zipBuffer) {
+      // fallback for old format
+      zipBuffer = await file.arrayBuffer();
+    }
+
+    const zip = await JSZip.loadAsync(zipBuffer);
 
     const manifest = await readJSON(zip, "manifest.json");
     const data = await readJSON(zip, manifest.data || "data.json");
@@ -124,3 +129,28 @@ function escapeHTML(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
+
+function extractZipFromText(text) {
+  const marker = "<!-- eform-container";
+
+  const start = text.indexOf(marker);
+  if (start < 0) return null;
+
+  const end = text.indexOf("-->", start);
+  if (end < 0) return null;
+
+  const base64 = text
+    .slice(start + marker.length, end)
+    .trim();
+
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes.buffer;
+}
+
+
