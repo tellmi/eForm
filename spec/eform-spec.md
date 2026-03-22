@@ -245,7 +245,19 @@ Example:
 
 ### Data
 
-The data file stores the current field values.
+The data component stores the current field values.
+
+The default format is:
+
+    data.json
+
+Profiles may define alternative data representations (e.g. XML).
+
+The data resource must be referenced in manifest.json.
+
+Implementations must not assume a specific data format unless required by the active profile.
+
+Further examples will use data.json.
 
 ---
 
@@ -277,15 +289,22 @@ Forms may contain multiple pages.
 
 The file `manifest.json` describes the structure of the eForm container.
 
-Example:
+Example (non-normative):
 
     {
-      "specVersion": "0.65",
+      "specVersion": "0.6.5",
       "layout": ["layout/page1.svg"],
       "schema": "schema.json",
       "data": "data.json",
       "formulas": "formulas/formulas.json"
     }
+
+The field `specVersion` is optional and informational.
+Implementations must not rely on it for compatibility decisions.
+
+The manifest must reference the primary data resource.
+
+The default is "data.json", but profiles may define alternative data files (e.g. "data.xml").
 
 ---
 
@@ -314,29 +333,20 @@ eForm is designed for direct browser rendering and system processing.
 
 ---
 
-## 8.1 Profiles
+## 8.1 Profiles (Informative)
 
-eForm supports derived formats called **profiles**.
+eForm supports derived formats called profiles.
 
-Profiles extend the base format for specific domains while remaining fully compatible with the core specification.
+Profiles extend the base format for specific domains while remaining compatible with the core specification.
 
-### Examples
+Examples include:
 
-- eCase
 - eBill
+- eCase
 
-### Declaration
+Profile definitions are specified in:
 
-A profile may be declared in `manifest.json`:
-
-    {
-      "profile": "eBill"
-    }
-
-### Rules
-
-- Profiles must remain valid eForm containers
-- Core structure must not be broken
+    spec/derivations.md
 
 ---
 
@@ -389,11 +399,144 @@ This specification is experimental and subject to change.
 
 ## 14. Security Considerations
 
-Implementations must treat all input as untrusted.
+eForm documents may originate from untrusted sources.
 
-SVG must not contain scripts or external references.
+Implementations must treat all content as untrusted input.
 
-JSON must not be executed.
+---
+
+### 14.1 General Principles
+
+- All input must be validated and sanitized before processing
+- Implementations must not execute embedded code
+- Implementations must fail safely when encountering invalid content
+
+---
+
+### 14.2 SVG Processing
+
+SVG content (preview and layout) must be treated as untrusted.
+
+Implementations must sanitize SVG content before rendering.
+
+At minimum, the following must be removed or ignored:
+
+- `<script>` elements
+- event handler attributes (`onload`, `onclick`, etc.)
+- `<foreignObject>` elements
+- external resource references (`href`, `xlink:href`)
+- `<image>` elements referencing external content
+
+Implementations should prefer a whitelist-based approach, allowing only safe SVG elements such as:
+
+- `rect`, `circle`, `ellipse`
+- `path`, `line`, `polyline`, `polygon`
+- `text`
+- `g`
+
+---
+
+### 14.3 Data Handling
+
+Form data must be treated strictly as data.
+
+Implementations must:
+
+- render values as plain text
+- not interpret values as HTML or executable code
+
+---
+
+### 14.4 Formula Evaluation
+
+Formulas must not allow execution of arbitrary code.
+
+Implementations must restrict formula evaluation to safe, deterministic expressions.
+
+Use of general-purpose code execution (e.g. `eval`, `Function`) is strongly discouraged.
+
+---
+
+### 14.5 Embedded SVG (Signatures)
+
+If SVG content is embedded within form data (e.g. signatures):
+
+- it must be sanitized using the same rules as layout SVG
+- only safe graphical elements should be rendered
+
+---
+
+### 14.6 Resource Limits
+
+Implementations should enforce limits to prevent denial-of-service attacks:
+
+- maximum file size
+- maximum SVG complexity
+- maximum JSON size
+
+---
+
+### 14.7 Trust and Authenticity
+
+eForm does not define authentication or identity mechanisms.
+
+Authenticity and integrity are typically ensured by the transmission channel.
+
+Examples include:
+
+- authenticated portals
+- secure upload systems
+- controlled document exchange workflows
+
+---
+
+## 15. Signatures and Authenticity
+
+eForm does not require built-in signature mechanisms.
+
+In many use cases, document authenticity and integrity are ensured by the transmission channel, such as:
+
+- secure upload portals
+- authenticated communication systems
+- trusted document exchange platforms
+
+### Optional Document Signing
+
+If electronic signatures are applied at the document level, implementations may sign selected resources within the container.
+
+Typical candidates include:
+
+- data.json
+- layout SVG files
+- preview.svg
+
+The exact signature mechanism is not defined by this specification.
+
+Future versions may define standardized approaches for embedded signatures.
+
+### Design Principle
+
+Signature handling should not interfere with:
+
+- readability of the preview
+- accessibility of structured data
+- long-term preservation of documents
+
+---
+
+## 16. Informative Documents
+
+Additional implementation guidance is provided in separate documents.
+
+These documents are informative and not part of the core specification.
+
+Examples include:
+
+- docs/import-processing.md
+- docs/mapping-and-semantics.md
+- docs/form-design.md
+
+Implementations may use these documents for guidance, but they are not required for compliance.
 
 ---
 

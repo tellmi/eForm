@@ -1,5 +1,8 @@
 # eForm Format Derivations
 
+Status: Draft  
+Project: open-eform  
+
 ---
 
 ## 1. Overview
@@ -12,9 +15,9 @@ Derived formats extend eForm without modifying the core specification.
 
 Examples include:
 
-- electronic invoices (eBill)
-- case files (eCase)
-- document bundles
+- electronic invoices (eBill)  
+- case files (eCase)  
+- document bundles  
 
 All derived formats must remain compatible with the base eForm structure.
 
@@ -24,16 +27,16 @@ All derived formats must remain compatible with the base eForm structure.
 
 The base eForm format focuses on:
 
-- visual layout (SVG)
-- structured data
-- machine-readable schema
-- optional computation rules
+- visual layout (SVG)  
+- structured data  
+- machine-readable schema  
+- optional computation rules  
 
 Domain-specific logic such as:
 
-- business rules
-- attachments
-- workflows
+- business rules  
+- attachments  
+- workflows  
 
 is intentionally excluded from the core format.
 
@@ -47,9 +50,9 @@ Derived formats are referred to as **profiles**.
 
 A profile must:
 
-- declare itself in `manifest.json`
-- remain a valid eForm container
-- not break core compatibility
+- declare itself in `manifest.json`  
+- remain a valid eForm container  
+- not break core compatibility  
 
 Example:
 
@@ -63,12 +66,12 @@ Unknown profiles must not prevent a document from being rendered as a standard e
 
 ## 4. eBill Profile
 
-The **eBill** profile defines a standardized usage of eForm for electronic invoices.
+The **eBill** profile defines a standardized envelope for electronic invoices.
 
 It integrates established invoice standards such as:
 
-- ZUGFeRD
-- XRechnung
+- XRechnung  
+- ZUGFeRD  
 
 ---
 
@@ -76,9 +79,11 @@ It integrates established invoice standards such as:
 
 In eBill documents:
 
-- the XML invoice is the **authoritative business data**
-- the SVG layout is a **human-readable representation**
-- the eForm container provides transport and rendering
+- the XML invoice is the **authoritative business data**  
+- the SVG layout is a **human-readable representation**  
+- the eForm container provides **transport, rendering, and interaction**  
+
+The eForm specification does not modify or redefine the underlying invoice standard.
 
 ---
 
@@ -88,7 +93,7 @@ The standard `data.json` file is replaced by:
 
     data.xml
 
-The XML must conform to a recognized invoice standard.
+The XML must conform to a recognized invoice standard (e.g. XRechnung or ZUGFeRD).
 
 ---
 
@@ -119,19 +124,19 @@ The manifest must include:
       "profile": "eBill"
     }
 
-The manifest must reference `data.xml`.
+The manifest must reference `data.xml` as the primary data source.
 
 ---
 
 ### 4.5 Behavior
 
-- `data.xml` is the single source of truth
-- viewers must not treat layout values as authoritative
-- the preview must reflect the XML content
+- `data.xml` is the single source of truth  
+- viewers must not treat layout values as authoritative  
+- the preview must reflect the XML content  
 
 ---
 
-### 4.6 Mapping
+### 4.6 Mapping (Optional)
 
 The schema may define mappings between layout fields and XML elements.
 
@@ -146,28 +151,30 @@ Example:
       }
     }
 
-Mappings are optional.
+Mappings are optional and implementation-specific.
 
 ---
 
 ### 4.7 Compatibility Rules
 
-- eBill must remain a valid eForm container
-- generic viewers must render the preview
-- generic viewers may ignore `data.xml`
+- eBill must remain a valid eForm container  
+- generic viewers must render the preview  
+- generic viewers may ignore `data.xml`  
 
 If both `data.json` and `data.xml` exist:
 
-- `data.xml` must take precedence
-- `data.json` must be ignored for business logic
+- `data.xml` must take precedence  
+- `data.json` must be ignored for business logic  
 
 ---
 
 ### 4.8 Constraints
 
-- `data.xml` must be UTF-8 encoded
-- XML must be self-contained
-- XML must not reference external resources
+- `data.xml` must be UTF-8 encoded  
+- XML must be self-contained  
+- XML must not reference external resources  
+
+Validation and code lists are defined by the respective invoice standard and must not be altered by eForm.
 
 ---
 
@@ -177,8 +184,8 @@ The **eCase** profile defines a container for grouping documents.
 
 An eCase consists of:
 
-- one or more eForms
-- additional attachments
+- one or more eForms  
+- additional attachments  
 
 ---
 
@@ -214,9 +221,9 @@ An eCase consists of:
 
 ### 5.3 Behavior
 
-- eCase acts as a container only
-- contained eForms remain independent and valid
-- attachments are not interpreted by the eForm specification
+- eCase acts as a container only  
+- contained eForms remain independent and valid  
+- attachments are not interpreted by the eForm specification  
 
 ---
 
@@ -226,9 +233,9 @@ Derived formats must remain compatible with the base eForm specification.
 
 Software that supports only eForm should still be able to:
 
-- extract embedded forms
-- render previews
-- access structured data where applicable
+- extract embedded forms  
+- render previews  
+- access structured data where applicable  
 
 Derived formats must not modify the fundamental structure of eForm documents.
 
@@ -238,9 +245,9 @@ Derived formats must not modify the fundamental structure of eForm documents.
 
 The identifiers:
 
-- eForm
-- eBill
-- eCase
+- eForm  
+- eBill  
+- eCase  
 
 are part of the specification.
 
@@ -252,9 +259,9 @@ Implementations must not use these names for incompatible formats.
 
 Possible future profiles include:
 
-- application packages
-- legal filing bundles
-- invoice archives
-- document exchange containers
+- application packages  
+- legal filing bundles  
+- invoice archives  
+- document exchange containers  
 
 The eForm format is intentionally minimal to support such extensions.
