@@ -1,0 +1,88 @@
+<svg viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg">
+
+  <style>
+    .label { font-size: 4px; font-family: sans-serif; }
+    .field { fill: none; stroke: black; stroke-width: 0.3; }
+    .section { font-size: 5px; font-weight: bold; }
+    .title { font-size: 5.5px; font-weight: bold; }
+    .computed { fill: #f5f5f5; stroke: black; stroke-dasharray: 1 1; stroke-width: 0.3; }
+  </style>
+
+  <!-- Header -->
+  <g transform="translate(20,8) scale(0.08)">
+    <rect x="40" y="40" width="240" height="240" rx="32" fill="#7fbf5f" stroke="#e67600" stroke-width="40"/>
+    <rect x="80" y="80" width="160" height="40" rx="20" fill="#000"/>
+    <rect x="80" y="140" width="120" height="40" rx="20" fill="#000"/>
+    <rect x="80" y="200" width="120" height="40" rx="20" fill="#000"/>
+  </g>
+
+  <text x="110" y="18" text-anchor="middle" class="title">
+    <tspan>eForm Comprehensive Example Form</tspan>
+  </text>
+
+  <!-- Articles -->
+  <text x="20" y="42" class="section"><tspan>Articles</tspan></text>
+
+  <text x="20" y="55" class="label" data-eform-label="f13"><tspan>Article 1 (€)</tspan></text>
+  <rect class="field" data-eform-field="f13" x="80" y="50" width="60" height="8"/>
+
+  <text x="20" y="68" class="label" data-eform-label="f14"><tspan>Article 2 (€)</tspan></text>
+  <rect class="field" data-eform-field="f14" x="80" y="63" width="60" height="8"/>
+
+  <text x="20" y="82" class="label" data-eform-label="f15"><tspan>Net Sum (€)</tspan></text>
+  <rect class="computed" data-eform-field="f15" x="80" y="77" width="60" height="8"/>
+
+  <text x="20" y="95" class="label" data-eform-label="f16"><tspan>Tax Rate (%)</tspan></text>
+  <rect class="field" data-eform-field="f16" x="80" y="90" width="40" height="8"/>
+  <text x="125" y="94" class="label"><tspan>%</tspan></text>
+
+  <text x="20" y="108" class="label" data-eform-label="f17"><tspan>Tax (€)</tspan></text>
+  <rect class="computed" data-eform-field="f17" x="80" y="103" width="60" height="8"/>
+
+  <text x="20" y="121" class="label" data-eform-label="f18"><tspan>Gross Sum (€)</tspan></text>
+  <rect class="computed" data-eform-field="f18" x="80" y="116" width="60" height="8"/>
+
+  <!-- Additional Information -->
+  <text x="20" y="140" class="section"><tspan>Additional Information</tspan></text>
+
+  <text x="20" y="153" class="label" data-eform-label="f19"><tspan>Employment Status</tspan></text>
+  <rect class="field" data-eform-field="f19" x="80" y="148" width="80" height="8"/>
+
+  <rect class="field" data-eform-field="f20" x="20" y="162" width="5" height="5"/>
+  <text x="30" y="166" class="label" data-eform-label="f20">
+    <tspan>I am acting on behalf of myself and not as an agent.</tspan>
+  </text>
+
+  <!-- Preferences -->
+  <text x="20" y="182" class="section"><tspan>Preferences</tspan></text>
+
+  <text x="20" y="195" class="label" data-eform-label="f21"><tspan>Contact Preference</tspan></text>
+
+  <circle class="field" data-eform-field="f21" data-eform-value="email"
+          cx="82.5" cy="192.5" r="2.5"/>
+  <text x="90" y="194" class="label"><tspan>Email</tspan></text>
+
+  <circle class="field" data-eform-field="f21" data-eform-value="phone"
+          cx="122.5" cy="192.5" r="2.5"/>
+  <text x="130" y="194" class="label"><tspan>Phone</tspan></text>
+
+  <circle class="field" data-eform-field="f21" data-eform-value="none"
+          cx="162.5" cy="192.5" r="2.5"/>
+  <text x="170" y="194" class="label"><tspan>None</tspan></text>
+
+  <!-- Assessment -->
+  <text x="20" y="215" class="section"><tspan>Assessment</tspan></text>
+
+  <text x="20" y="228" class="label" data-eform-label="f22"><tspan>Satisfaction (0–10)</tspan></text>
+  <rect class="field" data-eform-field="f22" x="80" y="223" width="100" height="8"/>
+
+  <text x="20" y="241" class="label" data-eform-label="f23"><tspan>Risk Tolerance (1–5)</tspan></text>
+  <rect class="field" data-eform-field="f23" x="80" y="236" width="100" height="8"/>
+
+  <text x="20" y="254" class="label" data-eform-label="f24"><tspan>Confidence (1–5)</tspan></text>
+  <rect class="field" data-eform-field="f24" x="80" y="249" width="100" height="8"/>
+
+  <text x="20" y="270" class="label" data-eform-label="f25"><tspan>Average Score</tspan></text>
+  <rect class="computed" data-eform-field="f25" x="80" y="265" width="60" height="8"/>
+
+</svg>

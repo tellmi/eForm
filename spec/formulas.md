@@ -44,6 +44,40 @@ Field identifiers must not contain spaces.
 
 The colon character `:` is reserved for **range expressions** and must not appear in identifiers.
 
+The key of each formula entry must be a valid field identifier defined in the schema.
+
+Formulas do not create new fields.
+They only define computed values for existing fields.
+
+A formula must not directly reference its own target field.
+
+Example (invalid):
+
+f1 = f1 + 1
+
+If a referenced field has no value:
+
+- implementations may treat it as undefined
+- the result of the formula should be considered undefined
+
+Implementations may:
+- leave the target field empty
+- or skip evaluation
+
+Implementations must not crash.
+
+Formulas must be side-effect free.
+
+They must not modify any field other than their target field.
+
+Example behaviour:
+
+{
+  "input": { "f1": 10, "f2": 5 },
+  "formula": "f3 = f1 - f2",
+  "expected": { "f3": 5 }
+}
+
 ---
 
 # 2. Numeric Representation
@@ -191,6 +225,7 @@ f1, f2, f3
 ~~~
 
 Range expressions may be used inside functions and should reference fields in ascending order.
+If a range is specified with descending identifiers (e.g. f3:f1), implementations may ignore the range or treat it as invalid.
 
 ---
 
@@ -217,6 +252,15 @@ Example:
 ~~~text
 round(sum(f1:f3), 2)
 ~~~
+
+Formulas are intentionally limited to simple arithmetic expressions.
+
+They are not intended to represent business logic, validation rules, or decision-making processes.
+
+This ensures:
+- security
+- transparency
+- long-term compatibility
 
 ---
 
@@ -293,17 +337,46 @@ Splitting calculations improves:
 
 # 13. Error Handling
 
-If a formula references a field that does not exist, implementations should:
+## Missing Value Handling
 
-- ignore the formula
-- leave the target field unchanged
-- optionally log a warning
+If a formula references fields with missing values, implementations should:
 
-Division by zero should result in an undefined value.
+- evaluate the expression as far as possible
+- compute a result if it can be determined unambiguously
+- otherwise treat the result as undefined
 
-Implementations may leave the target field empty or unchanged.
+---
 
-Formulas must never cause viewer crashes.
+## Numeric Interpretation
+
+For arithmetic operations:
+
+- missing numeric values may be treated as `0` if doing so allows a meaningful and unambiguous result
+- implementations must not produce results that could be misleading to users
+
+---
+
+## Division
+
+Division requires all operands to be defined.
+
+- If an operand of a division is missing, the result must be treated as undefined
+- Division by zero must result in an undefined value
+
+---
+
+## Result Handling
+
+If a formula result is undefined, implementations may:
+
+- leave the target field empty
+- or leave the previous value unchanged
+
+---
+
+## Stability
+
+Formulas must never cause viewer crashes or undefined behavior.
 
 ---
 
@@ -375,5 +448,4 @@ round(sum(f1:f3), 2)
 Implementations should parse formulas according to this grammar.
 
 Whitespace between tokens may be ignored.
-
 

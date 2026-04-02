@@ -1,0 +1,174 @@
+{
+  "fields": {
+    "f1": {
+      "type": "string",
+      "label": "First Name",
+      "maxLength": 40,
+      "semantic": "person.name"
+    },
+    "f2": {
+      "type": "string",
+      "label": "Last Name",
+      "maxLength": 40,
+      "semantic": "person.familyName"
+    },
+    "f3": {
+      "type": "date",
+      "label": "Birth Date",
+      "format": "dateISO",
+      "semantic": "person.birthDate"
+    },
+    "f4": {
+      "type": "selection",
+      "label": "Country",
+      "codeList": "std_iso3166",
+      "semantic": "address.country",
+      "options": ["Germany", "France", "UK"],
+      "ui": { "widget": "dropdown" }
+    },
+    "f5": {
+      "type": "selection",
+      "label": "Gender",
+      "semantic": "person.gender",
+      "options": ["female", "male", "diverse"],
+      "ui": { "widget": "dropdown" }
+    },
+
+    "f6": {
+      "type": "string",
+      "label": "Phone",
+      "format": "std_e164",
+      "semantic": "contact.phone"
+    },
+    "f7": {
+      "type": "string",
+      "label": "Email",
+      "format": "email",
+      "semantic": "contact.email"
+    },
+
+    "f8": {
+      "type": "string",
+      "label": "IBAN",
+      "format": "std_iban",
+      "semantic": "payment.iban"
+    },
+    "f9": {
+      "type": "string",
+      "label": "BIC",
+      "format": "std_bic",
+      "maxLength": 11,
+      "semantic": "payment.bic"
+    },
+
+    "f10": {
+      "type": "string",
+      "label": "Short Note",
+      "maxLength": 100
+    },
+    "f11": {
+      "type": "string",
+      "label": "Additional Information",
+      "maxLength": 1000,
+      "ui": { "multiline": true }
+    },
+
+    "f12": {
+      "type": "string",
+      "label": "Signature",
+      "format": "svg",
+      "ui": { "widget": "signature" }
+    },
+
+    "f13": {
+      "type": "number",
+      "label": "Article 1",
+      "format": "std_currency",
+      "semantic": "invoice.line1"
+    },
+    "f14": {
+      "type": "number",
+      "label": "Article 2",
+      "format": "std_currency",
+      "semantic": "invoice.line2"
+    },
+
+    "f15": {
+      "type": "number",
+      "label": "Net Sum",
+      "format": "std_currency",
+      "semantic": "invoice.net",
+      "computed": true
+    },
+    "f16": {
+      "type": "number",
+      "label": "Tax Rate (%)",
+      "semantic": "invoice.taxRate"
+    },
+    "f17": {
+      "type": "number",
+      "label": "Tax",
+      "format": "std_currency",
+      "semantic": "invoice.tax",
+      "computed": true
+    },
+    "f18": {
+      "type": "number",
+      "label": "Gross Sum",
+      "format": "std_currency",
+      "semantic": "invoice.total",
+      "computed": true
+    },
+
+    "f19": {
+      "type": "selection",
+      "label": "Employment Status",
+      "semantic": "person.employmentStatus",
+      "options": ["employed", "unemployed", "self-employed"],
+      "ui": { "widget": "dropdown" }
+    },
+    "f20": {
+      "type": "boolean",
+      "label": "Acting on own behalf",
+      "ui": { "widget": "checkbox" }
+    },
+
+    "f21": {
+      "type": "selection",
+      "label": "Contact Preference",
+      "semantic": "contact.preference",
+      "options": ["email", "phone", "none"],
+      "ui": { "widget": "radio" }
+    },
+  "f22": {
+    "type": "number",
+    "label": "Satisfaction",
+    "min": 0,
+    "max": 10,
+    "step": 1,
+    "ui": { "widget": "slider" }
+  },
+  "f23": {
+    "type": "number",
+    "label": "Risk Tolerance",
+    "min": 1,
+    "max": 5,
+    "step": 1,
+    "ui": { "widget": "slider" }
+  },
+  "f24": {
+    "type": "number",
+    "label": "Confidence",
+    "min": 1,
+    "max": 5,
+    "step": 1,
+    "ui": { "widget": "slider" }
+    },
+    "f25": {
+      "type": "number",
+      "label": "Average Score",
+      "computed": true
+    }
+  }
+}
+

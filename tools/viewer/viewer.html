@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>eForm Viewer (Prototype)</title>
 
 <link rel="icon" type="image/svg+xml" href="../../icon/eForm_min.svg">
@@ -42,6 +42,7 @@ h2 {
 /* ---------- viewer ---------- */
 
 #container {
+  margin-top: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -68,13 +69,96 @@ h2 {
 
 /* ---------- field styling ---------- */
 
-[data-eform-field] rect {
+/* base field behavior */
+[data-eform-field] {
   pointer-events: all;
   stroke: black;
+  cursor: text;
 }
 
-[data-eform-field]:hover rect {
+/* hover (all fields) */
+[data-eform-field]:hover {
   stroke: #0066ff;
+  fill: rgba(0, 102, 255, 0.08);
+}
+
+/* computed fields */
+[data-eform-computed] {
+  stroke: #999;
+  stroke-dasharray: 4 2;
+}
+
+/* sliders: invisible placeholders */
+[data-eform-field].slider-field {
+  fill-opacity: 0;
+  stroke: transparent;
+  cursor: pointer;
+}
+
+/* optional slider hover */
+[data-eform-field].slider-field:hover {
+  fill: rgba(0, 102, 255, 0.08);
+  opacity: 0.9;
+}
+
+/* active field */
+[data-eform-field].active {
+  stroke: #ff6600;
+}
+
+/* labels */
+[data-eform-label] {
+  pointer-events: none;
+  user-select: none;
+  fill: #000;
+  font-size: 14px;
+}
+
+/* field decorations */
+.field-id {
+  font-size: 3px;
+  fill: #777;
+  letter-spacing: 0.2px;
+}
+
+.char-counter {
+  font-size: 3px;
+  fill: #888;
+  pointer-events: none;
+}
+
+/* rendered values */
+.field-value {
+  font-size: 4px;
+  font-family: sans-serif;
+  fill: #000;
+  pointer-events: none;
+}
+
+.field-value[data-field][text-anchor="middle"] {
+  font-weight: bold;
+}
+
+/* signature */
+.signature {
+  pointer-events: none;
+}
+  
+.formula-target {
+    stroke: #007bff !important;
+    stroke-width: 2.5 !important;
+    fill: rgba(0,123,255,0.08);
+}
+
+.formula-source {
+    stroke: #28a745 !important;
+    stroke-width: 2.2 !important;
+    fill: rgba(40,167,69,0.08);
+}
+
+.formula-target,
+.formula-source {
+    vector-effect: non-scaling-stroke;
 }
 
 /* ---------- drop hint ---------- */
@@ -92,6 +176,12 @@ button {
   padding: 6px 12px;
   font-size: 14px;
   cursor: pointer;
+}
+
+#pageIndicator {
+  margin: 0 10px;
+  font-size: 14px;
+  color: #333;
 }
 
 /* ---------- print ---------- */
@@ -114,6 +204,10 @@ button {
 
   <input type="file" id="signatureInput" accept=".svg" style="display:none">
   <button id="applySignatureBtn">Apply Signature</button>
+    
+  <button id="prevPageBtn">◀</button>
+  <span id="pageIndicator">Page 1 / 1</span>
+  <button id="nextPageBtn">▶</button>
 </div>
 
 <div id="container"></div>

@@ -1,0 +1,23 @@
+{
+  "type": "open-eform",
+  "version": "0.7.1",
+
+  "formPublisher": "open-eform project",
+  "publisherDepartment": "specification examples",
+  "formName": "comprehensive_example_form",
+  "formVersion": "1.0",
+
+  "layout": [
+    "layout/page1.svg",
+    "layout/page2.svg"
+  ],
+
+  "schema": "schema.json",
+  "data": "data.json",
+
+  "formulas": "formulas/formulas.json",
+
+  "registries": [
+    "registries/standards.json"
+  ]
+}

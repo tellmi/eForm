@@ -1,7 +1,8 @@
 # eForm
 
-Version: 0.7
+Version: 0.7.1
 
+A document format for forms that are readable by humans and systems alike.
 **eForm** is an open document format for electronic forms.
 
 It combines:
@@ -10,7 +11,10 @@ It combines:
 * **JSON** (data + schema)
 * **ZIP container** (packaging)
 
-➡️ Result: a form that is **human-readable, machine-readable, and system-friendly**
+➡️ Result: a form that is human-readable, machine-readable, and directly processable
+
+No OCR. No manual data extraction.
+Every submitted form is immediately usable as structured data.
 
 ---
 
@@ -48,6 +52,7 @@ Process / transmit / archive
 * 🔗 **System integration ready**
 * 🔓 **Open standard (MPL 2.0)**
 * 🧩 **Extensible via profiles (eCase, eBill)**
+* ⚙️ **Built-in computation** (formulas for automated evaluation)
 
 ---
 
@@ -96,7 +101,7 @@ form.eform
 eForm supports specialized formats:
 
 * **eCase** → document bundles (forms + attachments)
-* **eBill** → invoice format (XML-based data)
+* **eBill** → invoice envelope (XML-based standards like XRechnung / ZUGFeRD)
 
 Profiles extend eForm without breaking compatibility.
 
@@ -132,18 +137,43 @@ Profiles extend eForm without breaking compatibility.
 
 ## What's New (0.7)
 
-Version 0.7 will focus on **security and robustness** of the eForm format.
+Version 0.7 suggests on **security and robustness** of the eForm format.
+
+## What’s New (0.7.1)
+### Core Value Clarification
+* emphasized machine-readable output as primary design goal
+* clarified elimination of OCR and post-processing
+* improved positioning for automated workflows and computation use cases
 
 ### Security Improvements
+* stricter SVG sanitization rules
+* defined safe element whitelist
+* improved handling of embedded SVG (e.g. signatures)
+* stronger restrictions for formula evaluation
+* guidance for secure viewer implementations
+* recommendations for resource limits (DoS protection)
 
-- stricter **SVG sanitization rules**
-- defined **safe element whitelist**
-- improved handling of **embedded SVG (e.g. signatures)**
-- stronger restrictions for **formula evaluation**
-- guidance for **secure viewer implementations**
-- recommendations for **resource limits** (DoS protection)
+These changes prepare eForm for use in production environments handling untrusted documents.
 
-These changes prepare eForm for use in **production environments handling untrusted documents**.
+### Manifest Clarification
+* clarified required manifest properties (layout, schema, data)
+* defined optional resource references:
+    * formulas
+    * registries
+* defined behavior for unknown manifest properties (must be ignored)
+* clarified that layout order defines page order
+
+These clarifications improve interoperability and forward compatibility without changing the format structure.
+
+### Comprehensive Example Form
+introduced a comprehensive example form demonstrating all core features:
+* field types (string, number, date, boolean, selection)
+* multi-page layout
+* registries (ISO examples)
+* formulas and computed fields
+* signature field (embedded SVG)
+* questionnaire with scoring
+serves as a reference implementation for form designers and implementers
 
 ---
 

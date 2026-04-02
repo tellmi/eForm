@@ -78,6 +78,8 @@ boolean
 selection
 ~~~
 
+The number type may represent either free numeric input or a discrete numeric scale (e.g. slider), depending on UI hints.
+
 Viewers may render different UI widgets depending on the field type.
 
 Examples:
@@ -89,6 +91,47 @@ Examples:
 - `selection` → dropdown or list selection  
 
 Implementations may support additional types, but unsupported types should fall back to basic text input.
+
+## 4.1 UI Hints
+
+Fields may include optional UI hints to guide rendering.
+
+Example:
+
+```json
+{
+  "f22": {
+    "type": "number",
+    "min": 0,
+    "max": 10,
+    "step": 1,
+    "ui": {
+      "widget": "slider"
+    }
+  }
+}
+```
+step — defines the step size between consecutive valid values (step size)
+
+### Supported UI widgets (examples)
+
+```text
+text
+textarea
+checkbox
+radio
+dropdown
+slider
+```
+
+UI hints:
+
+- are **optional**  
+- affect only presentation  
+- must not affect stored data  
+- may be ignored by implementations  
+
+If no UI hint is provided, viewers should choose a default representation based on the field type.
 
 ---
 
@@ -114,20 +157,20 @@ Format hints provide additional semantic information about the expected content 
 
 Example:
 
-~~~json
+```json
 {
   "email": {
     "type": "string",
     "format": "email"
   }
 }
-~~~
+```
 
 Format hints may help viewers provide improved input widgets, formatting, or validation.
 
 Examples of possible formats:
 
-~~~text
+```text
 email
 phone
 postalCode
@@ -135,15 +178,65 @@ iban
 url
 countryCode
 dateISO
-~~~
+currency
+```
+
+### 6.1 Simple Formats
+
+Simple format values (e.g. `"email"`, `"phone"`) are treated as general UI hints.
+
+Implementations may use them to:
+
+* select appropriate input widgets
+* apply formatting
+* assist user input
+
+---
+
+### 6.2 Registry-Based Formats
+
+Format values may reference standardized definitions provided via registries.
+
+If a format value matches an entry in:
+
+```
+registries/standards.json
+```
+
+implementations may use the referenced definition to apply advanced formatting rules.
+
+Example:
+
+```json
+{
+  "amount": {
+    "type": "number",
+    "format": "std_currency"
+  }
+}
+```
+
+Registry definitions may include:
+
+* formatting rules
+* localization behavior
+* dependencies on other fields (e.g. currency selection)
+
+---
+
+### 6.3 Behavior
 
 Format hints are **optional** and should be treated as guidance for user interfaces.
 
-Implementations must not rely on format hints for strict validation.
+Implementations must:
 
-Receiving systems remain responsible for final validation.
+* treat format hints as non-binding
+* not rely on them for strict validation
+* ignore unknown format values safely
 
-Unknown format values should be ignored.
+Receiving systems remain responsible for final validation of submitted data.
+
+Format hints must not alter the stored data values.
 
 ---
 

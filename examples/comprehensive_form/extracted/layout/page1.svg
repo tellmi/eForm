@@ -1,0 +1,72 @@
+<svg viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg">
+
+  <style>
+    .label { font-size: 4px; font-family: sans-serif; }
+    .field { fill: none; stroke: black; stroke-width: 0.3; }
+    .section { font-size: 5px; font-weight: bold; }
+    .title { font-size: 5.5px; font-weight: bold; }
+  </style>
+
+  <!-- Header -->
+  <g transform="translate(20,8) scale(0.08)">
+    <rect x="40" y="40" width="240" height="240" rx="32" fill="#7fbf5f" stroke="#e67600" stroke-width="40"/>
+    <rect x="80" y="80" width="160" height="40" rx="20" fill="#000"/>
+    <rect x="80" y="140" width="120" height="40" rx="20" fill="#000"/>
+    <rect x="80" y="200" width="120" height="40" rx="20" fill="#000"/>
+  </g>
+
+  <text x="110" y="18" text-anchor="middle" class="title">
+    <tspan>eForm Comprehensive Example Form</tspan>
+  </text>
+
+  <!-- Personal Information -->
+  <text x="20" y="45" class="section"><tspan>Personal Information</tspan></text>
+
+  <text x="20" y="58" class="label" data-eform-label="f1"><tspan>First Name</tspan></text>
+  <rect class="field" data-eform-field="f1" x="80" y="53" width="100" height="8"/>
+
+  <text x="20" y="72" class="label" data-eform-label="f2"><tspan>Last Name</tspan></text>
+  <rect class="field" data-eform-field="f2" x="80" y="67" width="100" height="8"/>
+
+  <text x="20" y="86" class="label" data-eform-label="f3"><tspan>Birth Date</tspan></text>
+  <rect class="field" data-eform-field="f3" x="80" y="81" width="60" height="8"/>
+
+  <text x="20" y="100" class="label" data-eform-label="f4"><tspan>Country</tspan></text>
+  <rect class="field" data-eform-field="f4" x="80" y="95" width="60" height="8"/>
+
+  <text x="20" y="114" class="label" data-eform-label="f5"><tspan>Gender</tspan></text>
+  <rect class="field" data-eform-field="f5" x="80" y="109" width="60" height="8"/>
+
+  <!-- Contact -->
+  <text x="20" y="132" class="section"><tspan>Contact</tspan></text>
+
+  <text x="20" y="146" class="label" data-eform-label="f6"><tspan>Phone (+49...)</tspan></text>
+  <rect class="field" data-eform-field="f6" x="80" y="141" width="100" height="8"/>
+
+  <text x="20" y="160" class="label" data-eform-label="f7"><tspan>Email</tspan></text>
+  <rect class="field" data-eform-field="f7" x="80" y="155" width="100" height="8"/>
+
+  <!-- Banking -->
+  <text x="20" y="178" class="section"><tspan>Banking</tspan></text>
+
+  <text x="20" y="192" class="label" data-eform-label="f8"><tspan>IBAN</tspan></text>
+  <rect class="field" data-eform-field="f8" x="80" y="187" width="100" height="8"/>
+
+  <text x="20" y="206" class="label" data-eform-label="f9"><tspan>BIC</tspan></text>
+  <rect class="field" data-eform-field="f9" x="80" y="201" width="60" height="8"/>
+
+  <!-- Notes -->
+  <text x="20" y="224" class="section"><tspan>Notes</tspan></text>
+
+  <text x="20" y="238" class="label" data-eform-label="f10"><tspan>Short Note</tspan></text>
+  <rect class="field" data-eform-field="f10" x="80" y="233" width="100" height="8"/>
+
+  <text x="20" y="252" class="label" data-eform-label="f11"><tspan>Additional Information</tspan></text>
+  <rect class="field" data-eform-field="f11" data-eform-multiline="true"
+        x="80" y="247" width="100" height="18"/>
+
+  <!-- Signature -->
+  <text x="20" y="270" class="label" data-eform-label="f12"><tspan>Signature</tspan></text>
+  <rect class="field" data-eform-field="f12" x="80" y="265" width="80" height="12"/>
+
+</svg>

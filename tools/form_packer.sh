@@ -5,7 +5,6 @@ set -e
 echo "eForm packer"
 echo
 
-# Go to project root
 cd "$(dirname "$0")/.."
 
 EXAMPLES_DIR="examples"
@@ -45,31 +44,34 @@ cd extracted
 
 rm -f "../$TMP_ZIP"
 
-# Add mimetype first (uncompressed)
+# mimetype first (no compression)
 zip -X -q -0 "../$TMP_ZIP" mimetype
 
-# Add remaining files (deterministic order)
+# rest (deterministic)
 find . -type f ! -name "mimetype" | sort | zip -X -q "../$TMP_ZIP" -@
 
 cd ..
 
 echo "Encoding ZIP to Base64..."
 
-BASE64_ZIP=$(base64 -w 0 "$TMP_ZIP")
+BASE64_ZIP=$(base64 "$TMP_ZIP" | tr -d '\n')
 
 echo "Combining preview.svg + embedded container..."
 
+MARKER="<!-- eform-container"
+
 (
-  # ensure UTF-8 header exists
+  # Ensure XML header
   if ! head -n 1 preview.svg | grep -q "<?xml"; then
     echo '<?xml version="1.0" encoding="UTF-8"?>'
   fi
 
   cat preview.svg
-  echo
-  echo "<!-- eform-container"
+  echo ""
+  echo "$MARKER"
   echo "$BASE64_ZIP"
   echo "-->"
+  echo ""
 ) > "$OUTPUT"
 
 rm "$TMP_ZIP"

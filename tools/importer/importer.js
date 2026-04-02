@@ -1,156 +1,268 @@
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
-const tableBody = document.querySelector("#resultTable tbody");
+const table = document.getElementById("resultTable");
+const thead = table.querySelector("thead");
+const tbody = table.querySelector("tbody");
+const previewContent = document.getElementById("previewContent");
 
-// --- Initialize table with placeholder ---
-showPlaceholder();
+let importedForms = [];
+let allFieldIds = new Set();
+let selectedRow = null;
 
-// --- Drag & Drop ---
+/* ---------------------------
+   DRAG & DROP
+--------------------------- */
 
 dropzone.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropzone.classList.add("dragover");
+    e.preventDefault();
+    dropzone.classList.add("dragover");
 });
 
 dropzone.addEventListener("dragleave", () => {
-  dropzone.classList.remove("dragover");
+    dropzone.classList.remove("dragover");
 });
 
-dropzone.addEventListener("drop", (e) => {
-  e.preventDefault();
-  dropzone.classList.remove("dragover");
+dropzone.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
 
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
+    const files = Array.from(e.dataTransfer.files);
+    await handleFiles(files);
 });
 
-// --- File Picker ---
+/* ---------------------------
+   FILE PICKER
+--------------------------- */
 
-fileInput.addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (file) handleFile(file);
+fileInput.addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files);
+    await handleFiles(files);
 });
 
-// --- Core Logic ---
+/* ---------------------------
+   CORE
+--------------------------- */
 
-async function handleFile(file) {
-  tableBody.innerHTML = "";
+async function handleFiles(files)
+{
+    importedForms = [];
+    allFieldIds.clear();
 
-  try {
-    const text = await file.text();
+    for (const file of files)
+    {
+        const form = await loadForm(file);
+        if (!form) continue;
 
-    let zipBuffer = extractZipFromText(text);
+        importedForms.push(form);
 
-    if (!zipBuffer) {
-      // fallback for old format
-      zipBuffer = await file.arrayBuffer();
+        Object.keys(form.data).forEach(id => allFieldIds.add(id));
     }
 
-    const zip = await JSZip.loadAsync(zipBuffer);
-
-    const manifest = await readJSON(zip, "manifest.json");
-    const data = await readJSON(zip, manifest.data || "data.json");
-    const schema = await readJSON(zip, manifest.schema || "schema.json");
-
-    renderTable(data, schema);
-
-  } catch (err) {
-    console.error(err);
-    alert("Failed to read eForm file.");
-    showPlaceholder();
-  }
+    renderTable();
+    clearPreview();
 }
 
-// --- Helpers ---
+/* ---------------------------
+   LOAD FORM
+--------------------------- */
 
-async function readJSON(zip, path) {
-  const file = zip.file(path);
-  if (!file) return {};
-  const text = await file.async("string");
-  return JSON.parse(text);
+async function loadForm(file)
+{
+    try
+    {
+        const text = await file.text();
+
+        let zipBuffer = extractZipFromText(text);
+        if (!zipBuffer)
+            zipBuffer = await file.arrayBuffer();
+
+        const zip = await JSZip.loadAsync(zipBuffer);
+
+        const manifest = await readJSON(zip, "manifest.json");
+        const data = await readJSON(zip, manifest.data || "data.json");
+
+        let previewSVG = "";
+
+        const marker = "<!-- eform-container";
+        const index = text.indexOf(marker);
+
+        if (index > 0)
+            previewSVG = text.slice(0, index).trim();
+
+        if (!previewSVG && manifest.layout?.length)
+        {
+            const file = zip.file(manifest.layout[0]);
+            if (file)
+                previewSVG = await file.async("string");
+        }
+
+        return {
+            name: file.name,
+            data,
+            previewSVG: sanitizeSVG(previewSVG)
+        };
+    }
+    catch (e)
+    {
+        console.warn("Failed:", file.name, e);
+        return null;
+    }
 }
 
-function renderTable(data, schema) {
-  const fields = (schema && schema.fields) || {};
+async function readJSON(zip, path)
+{
+    const file = zip.file(path);
+    if (!file) return {};
+    return JSON.parse(await file.async("string"));
+}
 
-  // Ensure table is clean
-  tableBody.innerHTML = "";
+/* ---------------------------
+   TABLE
+--------------------------- */
 
-  // Structured rendering (preferred)
-  if (Object.keys(fields).length > 0) {
-    Object.entries(fields).forEach(([key, fieldDef]) => {
-      const value = data[key] ?? "";
-      const semantic = fieldDef.semantic || "";
+function renderTable()
+{
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
 
-      const row = document.createElement("tr");
+    const fields = Array.from(allFieldIds);
 
-      row.innerHTML = `
-        <td>${escapeHTML(key)}</td>
-        <td>${escapeHTML(String(value))}</td>
-        <td>${escapeHTML(semantic)}</td>
-      `;
+    const headerRow = document.createElement("tr");
 
-      tableBody.appendChild(row);
+    headerRow.appendChild(th("File"));
+    fields.forEach(f => headerRow.appendChild(th(f)));
+
+    thead.appendChild(headerRow);
+
+    importedForms.forEach((form, index) =>
+    {
+        const row = document.createElement("tr");
+
+        row.addEventListener("click", () =>
+        {
+            selectRow(row, form);
+        });
+
+        row.appendChild(td(form.name));
+
+        fields.forEach(id =>
+        {
+            const value = form.data[id];
+            const cell = document.createElement("td");
+
+            if (typeof value === "object" && value?.type === "svg")
+                cell.textContent = "[signature]";
+            else
+                cell.textContent = value ?? "";
+
+            row.appendChild(cell);
+        });
+
+        tbody.appendChild(row);
     });
-  } else {
-    // Fallback: no schema available
-    Object.entries(data).forEach(([key, value]) => {
-      const row = document.createElement("tr");
-
-      row.innerHTML = `
-        <td>${escapeHTML(key)}</td>
-        <td>${escapeHTML(String(value))}</td>
-        <td></td>
-      `;
-
-      tableBody.appendChild(row);
-    });
-  }
-
-  // If still empty → show placeholder
-  if (tableBody.children.length === 0) {
-    showPlaceholder();
-  }
 }
 
-function showPlaceholder() {
-  tableBody.innerHTML = `
-    <tr>
-      <td colspan="3" style="text-align:center;color:#888;">
-        No data loaded
-      </td>
-    </tr>
-  `;
+/* ---------------------------
+   SELECTION + PREVIEW
+--------------------------- */
+
+function selectRow(row, form)
+{
+    if (selectedRow)
+        selectedRow.classList.remove("selected");
+
+    selectedRow = row;
+    row.classList.add("selected");
+
+    showPreview(form.previewSVG);
 }
 
-function escapeHTML(str) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function showPreview(svgText)
+{
+    if (!svgText)
+    {
+        previewContent.innerHTML =
+            "<div style='color:#888'>No preview</div>";
+        return;
+    }
+
+    previewContent.innerHTML = svgText;
+
+    const svg = previewContent.querySelector("svg");
+    if (!svg) return;
+
+    svg.removeAttribute("width");
+    svg.removeAttribute("height");
+
+    svg.style.width = "100%";
+    svg.style.height = "auto";
 }
 
-function extractZipFromText(text) {
-  const marker = "<!-- eform-container";
-
-  const start = text.indexOf(marker);
-  if (start < 0) return null;
-
-  const end = text.indexOf("-->", start);
-  if (end < 0) return null;
-
-  const base64 = text
-    .slice(start + marker.length, end)
-    .trim();
-
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-
-  return bytes.buffer;
+function clearPreview()
+{
+    previewContent.innerHTML =
+        "<div style='color:#888;text-align:center;'>Select a row to preview</div>";
 }
 
+/* ---------------------------
+   HELPERS
+--------------------------- */
 
+function th(text)
+{
+    const el = document.createElement("th");
+    el.textContent = text;
+    return el;
+}
+
+function td(text)
+{
+    const el = document.createElement("td");
+    el.textContent = text;
+    return el;
+}
+
+function sanitizeSVG(svg)
+{
+    return svg
+        ?.replace(/^\uFEFF/, "")
+        .replace(/<\?xml[\s\S]*?\?>/gi, "")
+        .replace(/<!DOCTYPE[\s\S]*?>/gi, "")
+        .replace(/font-family:\s*sans\b/g, "sans-serif")
+        .trim() || "";
+}
+
+/* ---------------------------
+   ZIP EXTRACTION
+--------------------------- */
+
+function extractZipFromText(text)
+{
+    const marker = "<!-- eform-container";
+
+    const start = text.indexOf(marker);
+    if (start < 0) return null;
+
+    const end = text.indexOf("-->", start);
+    if (end < 0) return null;
+
+    const base64 = text
+        .slice(start + marker.length, end)
+        .replace(/\s+/g, "");
+
+    try
+    {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+
+        for (let i = 0; i < binary.length; i++)
+            bytes[i] = binary.charCodeAt(i);
+
+        return bytes.buffer;
+    }
+    catch (e)
+    {
+        console.error("Base64 decode failed", e);
+        return null;
+    }
+}

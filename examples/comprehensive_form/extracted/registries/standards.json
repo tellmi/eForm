@@ -1,0 +1,36 @@
+{
+  "standards": {
+    "std_iso3166": {
+      "system": "ISO-3166-1",
+      "version": "2023",
+      "description": "Two-letter country codes",
+      "url": "https://www.iso.org/iso-3166-country-codes.html"
+    },
+    "std_iso4217": {
+      "system": "ISO-4217",
+      "version": "2023",
+      "description": "Currency codes (EUR, USD, ...)",
+      "url": "https://www.iso.org/iso-4217-currency-codes.html"
+    },
+    "std_iban": {
+      "system": "ISO-13616",
+      "description": "International Bank Account Number",
+      "url": "https://www.iso.org/standard/81090.html"
+    },
+    "std_bic": {
+      "system": "ISO-9362",
+      "description": "Bank Identifier Code (BIC / SWIFT)",
+      "url": "https://www.iso.org/standard/60390.html"
+    },
+    "std_e164": {
+      "system": "ITU-T E.164",
+      "description": "International telephone numbering format",
+      "url": "https://www.itu.int/rec/T-REC-E.164"
+    },
+    "std_email": {
+      "system": "RFC 5322",
+      "description": "Internet email format",
+      "url": "https://datatracker.ietf.org/doc/html/rfc5322"
+    }
+  }
+}

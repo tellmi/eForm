@@ -4,84 +4,167 @@
   <meta charset="UTF-8" />
   <title>eForm Importer</title>
 
-  
   <link rel="icon" type="image/svg+xml" href="../../icon/eForm_min.svg">
 
-  <!-- JSZip -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
 
-    h1 {
-      margin-bottom: 10px;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
 
-    #dropzone {
-      border: 2px dashed #888;
-      border-radius: 10px;
-      padding: 40px;
-      text-align: center;
-      color: #555;
-      margin-bottom: 20px;
-      transition: background 0.2s, border-color 0.2s;
-    }
+  h1 {
+    margin-bottom: 10px;
+  }
 
-    #dropzone.dragover {
-      background: #f0f8ff;
-      border-color: #007acc;
-      color: #000;
-    }
+  /* =========================
+     MAIN LAYOUT
+  ========================= */
+  #content {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden; /* prevents layout breaking */
+  }
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
+  /* =========================
+     LEFT SIDE
+  ========================= */
+  #leftPanel {
+    flex: 1 1 0;
+    min-width: 0;
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    th {
-      background: #f5f5f5;
-    }
+  /* DROPZONE */
+  #dropzone {
+    border: 2px dashed #888;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    color: #555;
+    transition: background 0.2s, border-color 0.2s;
+  }
 
-    /* ✨ Semantic highlight */
-    td:nth-child(3) {
-      color: #007acc;
-      font-size: 0.9em;
-    }
+  #dropzone.dragover {
+    background: #f0f8ff;
+    border-color: #007acc;
+    color: #000;
+  }
 
-    #fileInput {
-      margin-top: 10px;
-    }
+  /* TABLE */
+  #tableContainer {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid #ccc;
+    min-width: 0;
+  }
+
+  /* =========================
+     RIGHT SIDE (PREVIEW)
+  ========================= */
+  #previewPanel {
+    flex: 0 0 500px;  /* 🔥 fixed width → stable layout */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background: #fafafa;
+  }
+
+  #previewContent {
+    flex: 1;
+    overflow-y: auto;   /* ✅ vertical only */
+    overflow-x: hidden; /* ❌ no horizontal scroll */
+    padding: 10px;
+
+    min-height: 0;
+    min-width: 0;
+  }
+
+  /* SVG behaves like document */
+  #previewContent svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* =========================
+     TABLE STYLING
+  ========================= */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  th {
+    background: #f5f5f5;
+    position: sticky;
+    top: 0;
+  }
+
+  tr.selected {
+    background: #e6f2ff;
+  }
   </style>
 </head>
+
 <body>
 
 <h1>eForm Importer</h1>
 
-<div id="dropzone">
-  Drag & Drop your <strong>.eform</strong> file here<br/>
-  or<br/>
-  <input type="file" id="fileInput" accept=".eform" />
-</div>
+<div id="content">
 
-<table id="resultTable">
-  <thead>
-    <tr>
-      <th>Field ID</th>
-      <th>Value</th>
-      <th>Semantic</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <!-- LEFT SIDE -->
+  <div id="leftPanel">
+
+    <div id="dropzone">
+      Drag & Drop your <strong>.eform</strong> files here<br/>
+      or<br/>
+      <input type="file" id="fileInput" accept=".eform" multiple />
+    </div>
+
+    <div id="tableContainer">
+      <table id="resultTable">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div id="previewPanel">
+    <div id="previewContent">
+
+      <div id="previewPlaceholder" style="color:#888;text-align:center;">
+        Select a row to preview
+      </div>
+
+    </div>
+  </div>
+
+</div>
 
 <script src="importer.js"></script>
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 794 1123">
+
+  <style>
+    text { font-family: sans-serif; font-size: 4mm; }
+    .title { font-size: 6mm; font-weight: bold; }
+  </style>
+
+  <text class="title" x="20" y="30">
+    Example eForm – Simple Registration
+  </text>
+
+  <text x="20" y="60">First name</text>
+  <text x="70" y="73"></text>
+
+  <text x="20" y="90">Last name</text>
+  <text x="70" y="103"></text>
+
+  <text x="20" y="120">Birth date</text>
+  <text x="70" y="133"></text>
+
+  <text x="20" y="150">Birth country</text>
+  <text x="70" y="163"></text>
+
+</svg>
