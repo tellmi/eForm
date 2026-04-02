@@ -4,6 +4,12 @@ const table = document.getElementById("resultTable");
 const thead = table.querySelector("thead");
 const tbody = table.querySelector("tbody");
 const previewContent = document.getElementById("previewContent");
+const exportBtn = document.getElementById("exportCSV");
+
+if (exportBtn)
+{
+    exportBtn.addEventListener("click", exportCSV);
+}
 
 let importedForms = [];
 let allFieldIds = new Set();
@@ -266,3 +272,100 @@ function extractZipFromText(text)
         return null;
     }
 }
+
+function escapeCSV(value)
+{
+    if (value == null) return "";
+
+    const s = String(value);
+
+    if (s.includes(";") || s.includes('"') || s.includes("\n"))
+        return '"' + s.replace(/"/g, '""') + '"';
+
+    return s;
+}
+
+function downloadCSV(content)
+{
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "eform_export.csv";
+    link.click();
+}
+
+function exportCSV()
+{
+    if (!importedForms.length)
+    {
+        alert("No forms loaded.");
+        return;
+    }
+
+    const fields = Array.from(allFieldIds);
+
+    const rows = [];
+
+    /* ---------------------------
+       HEADER
+    --------------------------- */
+    rows.push(["file", ...fields]);
+
+    /* ---------------------------
+       DATA ROWS
+    --------------------------- */
+    importedForms.forEach(form =>
+    {
+        const row = [];
+
+        // file name
+        row.push(form.name);
+
+        fields.forEach(fieldId =>
+        {
+            const value = form.data[fieldId];
+
+            if (typeof value === "object" && value?.type === "svg")
+            {
+                row.push("[signature]");
+            }
+            else if (value === undefined || value === null)
+            {
+                row.push("");
+            }
+            else
+            {
+                row.push(value);
+            }
+        });
+
+        rows.push(row);
+    });
+
+    /* ---------------------------
+       BUILD CSV STRING
+    --------------------------- */
+    const csv = rows
+        .map(row =>
+            row.map(escapeCSV).join(";") // use ";" for EU Excel compatibility
+        )
+        .join("\n");
+
+    /* ---------------------------
+       DOWNLOAD FILE
+    --------------------------- */
+    const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "eform_export.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
